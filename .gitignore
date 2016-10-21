@@ -1,0 +1,22 @@
+bin
+lib
+tmp
+internal
+ipch
+.vs
+Debug
+Release
+project
+
+*.suo
+*.user
+*.sdf
+*.opendb
+*.pch
+*.aps
+
+*.db
+
+# cmake files
+CMakeFiles
+*.cmake
