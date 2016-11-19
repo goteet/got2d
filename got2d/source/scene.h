@@ -11,16 +11,17 @@ class Scene;
 class SceneNode : public g2d::SceneNode
 {
 public:
-	SceneNode(::Scene* scene, SceneNode* parent, g2d::Entity* entity, bool autoRelease);
+	SceneNode(::Scene* scene, SceneNode* parent, int childID, g2d::Entity* entity, bool autoRelease);
 	virtual ~SceneNode();
 	void Update(unsigned int elpasedTime);
 	void Render(g2d::Camera* camera);
 	void RenderSingle(g2d::Camera* camera);
-	void SetRenderingOrder(int& index);
+	void AdjustRenderingOrder();
 
 public:
 	virtual g2d::Scene* GetScene() const override;
 	virtual g2d::SceneNode* GetParentNode() override;
+	virtual g2d::SceneNode* GetPrevSiblingNode() override;
 	virtual g2d::SceneNode* GetNextSiblingNode() override;
 	virtual g2d::SceneNode* CreateSceneNode(g2d::Entity* entity, bool autoRelease)override;
 	virtual const gml::mat32& GetLocalMatrix() override;
@@ -45,11 +46,14 @@ private:
 	void SetLocalMatrixDirty();
 	void SetWorldMatrixDirty();
 	void AdjustSpatial();
+	void SetRenderingOrder(int& index);
+	::SceneNode* GetPrevSibling();
+	::SceneNode* GetNextSibling();
 
 	::Scene* m_scene = nullptr;
 	::SceneNode* m_parent = nullptr;
 	g2d::Entity* m_entity = nullptr;
-
+	int m_childID = 0;
 	int m_baseRenderingOrder = 0;
 
 	unsigned int m_visibleMask = g2d::DEFAULT_VISIBLE_MASK;
@@ -80,12 +84,12 @@ public:
 	inline void Update(unsigned int elpasedTime) { return m_root->Update(elpasedTime); }
 	void Render();
 	void SetCameraOrderDirty();
-	void ResortNodesRenderingOrder();
 	SpatialGraph* GetSpatialGraph() { return &m_spatial; }
 
 public:
 	inline virtual g2d::Scene* GetScene() const override { return m_root->GetScene(); }
 	inline virtual SceneNode* GetParentNode() override { return m_root->GetParentNode(); }
+	inline virtual SceneNode* GetPrevSiblingNode() override { return m_root->GetPrevSiblingNode(); }
 	inline virtual SceneNode* GetNextSiblingNode() override { return m_root->GetNextSiblingNode(); }
 	virtual g2d::SceneNode* CreateSceneNode(g2d::Entity* e, bool autoRelease) override;
 	inline virtual const gml::mat32& GetLocalMatrix() override { return m_root->GetLocalMatrix(); }
