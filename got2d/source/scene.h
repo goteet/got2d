@@ -31,6 +31,10 @@ public:
 	virtual g2d::SceneNode* SetPivot(const gml::vec2& pivot) override;
 	virtual g2d::SceneNode* SetScale(const gml::vec2& scale) override;
 	virtual g2d::SceneNode* SetRotation(gml::radian r) override;
+	virtual void MovePrevToFront() override;
+	virtual void MovePrevToBack() override;
+	virtual void MovePrev() override;
+	virtual void MoveNext() override;
 	inline virtual void SetVisible(bool visible) override { m_isVisible = visible; }
 	virtual void SetStatic(bool s) override;
 	inline virtual const gml::vec2& GetPosition()  const override { return m_position; }
@@ -47,6 +51,7 @@ private:
 	void SetWorldMatrixDirty();
 	void AdjustSpatial();
 	void SetRenderingOrder(int& index);
+	void MoveSelfTo(int to);
 	::SceneNode* GetPrevSibling();
 	::SceneNode* GetNextSibling();
 
@@ -99,6 +104,10 @@ public:
 	inline virtual g2d::SceneNode* SetPivot(const gml::vec2& pivot) override { m_root->SetPivot(pivot); return this; }
 	inline virtual g2d::SceneNode* SetScale(const gml::vec2& scale) override { m_root->SetScale(scale); return this; }
 	inline virtual g2d::SceneNode* SetRotation(gml::radian r) override { m_root->SetRotation(r); return this; }
+	virtual void MovePrevToFront() override { m_root->MovePrevToFront(); }
+	virtual void MovePrevToBack() override { m_root->MovePrevToBack(); }
+	virtual void MovePrev() override { m_root->MovePrev(); }
+	virtual void MoveNext() override { m_root->MoveNext(); }
 	inline virtual void SetVisible(bool visible) override { m_root->SetVisible(visible); }
 	inline virtual void SetStatic(bool visible) override { m_root->SetStatic(visible); }
 	inline virtual const gml::vec2& GetPosition()  const override { return m_root->GetPosition(); }

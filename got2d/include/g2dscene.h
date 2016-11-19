@@ -82,6 +82,10 @@ namespace g2d
 		virtual SceneNode* SetPivot(const gml::vec2& pivot) = 0;
 		virtual SceneNode* SetScale(const gml::vec2& scale) = 0;
 		virtual SceneNode* SetRotation(gml::radian r) = 0;
+		virtual void MovePrevToFront() = 0;
+		virtual void MovePrevToBack() = 0;
+		virtual void MovePrev() = 0;
+		virtual void MoveNext() = 0;
 		virtual void SetVisible(bool) = 0;
 		virtual void SetStatic(bool) = 0;
 		virtual void SetVisibleMask(unsigned int mask, bool recursive) = 0;

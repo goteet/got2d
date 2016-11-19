@@ -285,6 +285,61 @@ g2d::SceneNode* SceneNode::SetRotation(gml::radian r)
 	m_rotation = r;
 	return this;
 }
+void SceneNode::MovePrevToFront()
+{
+	MoveSelfTo(0);
+}
+void SceneNode::MovePrevToBack()
+{
+	if (m_parent)
+	{
+		MoveSelfTo(m_parent->m_children.size() - 1);
+	}
+}
+void SceneNode::MovePrev()
+{
+	MoveSelfTo(m_childID - 1);
+}
+void SceneNode::MoveNext()
+{
+	MoveSelfTo(m_childID + 1);
+}
+
+void SceneNode::MoveSelfTo(int to)
+{
+	if (m_parent == nullptr || m_childID == to)
+	{
+		return;
+	}
+
+	auto& siblings = m_parent->m_children;
+	int siblingCount = static_cast<int>(siblings.size());
+	if (siblingCount > 1 && siblingCount > to)
+	{
+		auto oldID = m_childID;
+		auto newID = to;
+		if (newID > oldID)
+		{
+			for (int i = oldID; i < newID; i++)
+			{
+				siblings[i] = siblings[i + 1];
+				siblings[i]->m_childID = i;
+			}
+		}
+		else
+		{
+			for (int i = oldID; i > newID; i--)
+			{
+				siblings[i] = siblings[i - 1];
+				siblings[i]->m_childID = i;
+			}
+		}
+		m_childID = newID;
+		siblings[newID] = this;
+		AdjustRenderingOrder();
+	}
+	
+}
 
 void SceneNode::SetStatic(bool s)
 {
