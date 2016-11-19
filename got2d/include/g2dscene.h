@@ -72,6 +72,8 @@ namespace g2d
 	public:
 		virtual ~SceneNode();
 		virtual Scene* GetScene() const = 0;
+		virtual SceneNode* GetParentNode() = 0;
+		virtual SceneNode* GetNextSiblingNode() = 0;
 		virtual SceneNode* CreateSceneNode(Entity*, bool autoRelease) = 0;
 		virtual const gml::mat32& GetLocalMatrix() = 0;
 		virtual const gml::mat32& GetWorldMatrix() = 0;

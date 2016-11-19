@@ -144,12 +144,12 @@ void SceneNode::RenderSingle(g2d::Camera* camera)
 void SceneNode::SetRenderingOrder(int& index)
 {
 	//for mulity-entity backup.
+	m_baseRenderingOrder = index++;
 	if (m_entity)
 	{
 		m_entity->SetRenderingOrder(index);
 		index++;
 	}
-	index++;
 
 	for (auto& child : m_children)
 	{
@@ -160,6 +160,35 @@ void SceneNode::SetRenderingOrder(int& index)
 g2d::Scene* SceneNode::GetScene() const
 {
 	return m_scene;
+}
+
+
+g2d::SceneNode* SceneNode::GetParentNode()
+{
+	return m_parent;
+}
+
+g2d::SceneNode* SceneNode::GetNextSiblingNode()
+{
+	auto& siblings = m_parent->m_children;
+
+	int siblingID = -1;
+	for (int i = 0; i < siblings.size(); i++)
+	{
+		if (siblings[i] == this)
+		{
+			siblingID = i + 1;
+			break;
+		}
+	}
+	if (siblingID >= 0 && siblingID < siblings.size())
+	{
+		return siblings[siblingID];
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 g2d::SceneNode* SceneNode::CreateSceneNode(g2d::Entity* e, bool autoRelease)
@@ -255,7 +284,7 @@ void Scene::SetCameraOrderDirty()
 
 void Scene::ResortNodesRenderingOrder()
 {
-	int index = 0;
+	int index = -1;//root==0;
 	m_root->SetRenderingOrder(index);
 }
 

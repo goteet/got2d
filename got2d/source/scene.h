@@ -20,6 +20,8 @@ public:
 
 public:
 	virtual g2d::Scene* GetScene() const override;
+	virtual g2d::SceneNode* GetParentNode() override;
+	virtual g2d::SceneNode* GetNextSiblingNode() override;
 	virtual g2d::SceneNode* CreateSceneNode(g2d::Entity* entity, bool autoRelease)override;
 	virtual const gml::mat32& GetLocalMatrix() override;
 	virtual const gml::mat32& GetWorldMatrix() override;
@@ -47,6 +49,8 @@ private:
 	::Scene* m_scene = nullptr;
 	::SceneNode* m_parent = nullptr;
 	g2d::Entity* m_entity = nullptr;
+
+	int m_baseRenderingOrder = 0;
 
 	unsigned int m_visibleMask = g2d::DEFAULT_VISIBLE_MASK;
 	bool m_autoRelease = false;
@@ -81,6 +85,8 @@ public:
 
 public:
 	inline virtual g2d::Scene* GetScene() const override { return m_root->GetScene(); }
+	inline virtual SceneNode* GetParentNode() override { return m_root->GetParentNode(); }
+	inline virtual SceneNode* GetNextSiblingNode() override { return m_root->GetNextSiblingNode(); }
 	virtual g2d::SceneNode* CreateSceneNode(g2d::Entity* e, bool autoRelease) override;
 	inline virtual const gml::mat32& GetLocalMatrix() override { return m_root->GetLocalMatrix(); }
 	inline virtual const gml::mat32& GetWorldMatrix() override { return m_root->GetWorldMatrix(); }
