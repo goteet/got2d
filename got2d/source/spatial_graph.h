@@ -24,7 +24,7 @@ public:
 	inline bool IsEmpty() { return m_isEmpty; }
 
 private:
-	void TestEmpty();
+	void TryMarkEmpty();
 
 	enum Direction
 	{

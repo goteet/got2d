@@ -107,7 +107,7 @@ QuadTreeNode* QuadTreeNode::AddToDynamicList(g2d::Entity* entity)
 	m_dynamicEntities.push_back(entity);
 	return this;
 }
-void QuadTreeNode::TestEmpty()
+void QuadTreeNode::TryMarkEmpty()
 {
 	if (m_dynamicEntities.size() > 0)
 		return;
@@ -127,7 +127,7 @@ void QuadTreeNode::TestEmpty()
 		m_isEmpty = true;
 		if (m_parent)
 		{
-			m_parent->TestEmpty();
+			m_parent->TryMarkEmpty();
 		}
 	}
 }
@@ -143,7 +143,7 @@ void QuadTreeNode::Remove(g2d::Entity* entity)
 		}
 	}
 
-	TestEmpty();
+	TryMarkEmpty();
 }
 
 void QuadTreeNode::FindVisible(g2d::Camera* camera, std::vector<g2d::Entity*>& outVisibleList)
