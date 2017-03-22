@@ -28,7 +28,7 @@ private:
 class Keyboard : public g2d::Keyboard
 {
 public:
-	virtual bool IsPressing(g2d::KeyCode key) const override;
+	virtual g2d::SwitchState PressState(g2d::KeyCode key) const override;
 
 public:
 	static Keyboard Instance;
@@ -45,16 +45,12 @@ public:
 private:
 	class KeyState
 	{
-		enum class State :int
-		{
-			Releasing, Pressed, Pressing
-		};
-		State pressState = State::Releasing;
+		g2d::SwitchState pressState = g2d::SwitchState::Releasing;
 		uint32_t pressTimeStamp;
 	public:
 		const g2d::KeyCode Key;
 		KeyState(g2d::KeyCode key) : Key(key) { }
-		bool IsPressing() const { return pressState != State::Releasing; }
+		g2d::SwitchState PressState() const { return pressState; }
 		void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
 		void Update(uint32_t currentTimeStamp);
 		void ForceRelease();
@@ -69,14 +65,26 @@ private:
 
 class Mouse : public g2d::Mouse
 {
+public:
+	static Mouse Instance;
+
+	void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
+
 public:	//g2d::Mouse
-	virtual bool IsPressing(g2d::MouseButton button) const override;
+	virtual g2d::SwitchState PressState(g2d::MouseButton button) const override;
 
 	virtual const gml::coord& CursorPosition() const override;
-
-public:
-	void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
 
 private:
 	gml::coord m_cursorPosition;
 };
+
+inline ::Keyboard& GetKeyboard()
+{
+	return ::Keyboard::Instance;
+}
+
+inline ::Mouse& GetMouse()
+{
+	return ::Mouse::Instance;
+}

@@ -398,32 +398,32 @@ void SceneNode::OnMessage(const g2d::Message& message)
 
 void SceneNode::OnCursorEnterFrom(::SceneNode* adjacency, const gml::coord& cursorPos)
 {
-	m_entity->OnCursorEnterFrom(adjacency, cursorPos, ::Keyboard::Instance);
+	m_entity->OnCursorEnterFrom(adjacency, cursorPos, GetKeyboard());
 }
 
 void SceneNode::OnCursorLeaveTo(::SceneNode* adjacency, const gml::coord& cursorPos)
 {
-	m_entity->OnCursorLeaveTo(adjacency, cursorPos, ::Keyboard::Instance);
+	m_entity->OnCursorLeaveTo(adjacency, cursorPos, GetKeyboard());
 }
 
-void SceneNode::OnCursorHovering(const gml::coord& cursorPos)
+void SceneNode::OnCursorHovering()
 {
-	m_entity->OnCursorHovering(cursorPos, ::Keyboard::Instance);
+	m_entity->OnCursorHovering(GetMouse().CursorPosition(), GetKeyboard());
 }
 
 void SceneNode::OnClick(g2d::MouseButton button, const gml::coord& cursorPos)
 {
 	if (button == g2d::MouseButton::Left)
 	{
-		m_entity->OnLClick(cursorPos, ::Keyboard::Instance);
+		m_entity->OnLClick(cursorPos, GetKeyboard());
 	}
 	else if (button == g2d::MouseButton::Right)
 	{
-		m_entity->OnRClick(cursorPos, ::Keyboard::Instance);
+		m_entity->OnRClick(cursorPos, GetKeyboard());
 	}
 	else
 	{
-		m_entity->OnMClick(cursorPos, ::Keyboard::Instance);
+		m_entity->OnMClick(cursorPos, GetKeyboard());
 	}
 }
 
@@ -431,15 +431,15 @@ void SceneNode::OnDoubleClick(g2d::MouseButton button, const gml::coord& cursorP
 {
 	if (button == g2d::MouseButton::Left)
 	{
-		m_entity->OnLDoubleClick(cursorPos, ::Keyboard::Instance);
+		m_entity->OnLDoubleClick(cursorPos, GetKeyboard());
 	}
 	else if (button == g2d::MouseButton::Right)
 	{
-		m_entity->OnRDoubleClick(cursorPos, ::Keyboard::Instance);
+		m_entity->OnRDoubleClick(cursorPos, GetKeyboard());
 	}
 	else
 	{
-		m_entity->OnMDoubleClick(cursorPos, ::Keyboard::Instance);
+		m_entity->OnMDoubleClick(cursorPos, GetKeyboard());
 	}
 }
 
@@ -447,15 +447,15 @@ void SceneNode::OnDragBegin(g2d::MouseButton button, const gml::coord& cursorPos
 {
 	if (button == g2d::MouseButton::Left)
 	{
-		m_entity->OnLDragBegin(cursorPos, ::Keyboard::Instance);
+		m_entity->OnLDragBegin(cursorPos, GetKeyboard());
 	}
 	else if (button == g2d::MouseButton::Right)
 	{
-		m_entity->OnRDragBegin(cursorPos, ::Keyboard::Instance);
+		m_entity->OnRDragBegin(cursorPos, GetKeyboard());
 	}
 	else
 	{
-		m_entity->OnMDragBegin(cursorPos, ::Keyboard::Instance);
+		m_entity->OnMDragBegin(cursorPos, GetKeyboard());
 	}
 }
 
@@ -463,15 +463,15 @@ void SceneNode::OnDragging(g2d::MouseButton button, const gml::coord& cursorPos)
 {
 	if (button == g2d::MouseButton::Left)
 	{
-		m_entity->OnLDragging(cursorPos, ::Keyboard::Instance);
+		m_entity->OnLDragging(cursorPos, GetKeyboard());
 	}
 	else if (button == g2d::MouseButton::Right)
 	{
-		m_entity->OnRDragging(cursorPos, ::Keyboard::Instance);
+		m_entity->OnRDragging(cursorPos, GetKeyboard());
 	}
 	else
 	{
-		m_entity->OnMDragging(cursorPos, ::Keyboard::Instance);
+		m_entity->OnMDragging(cursorPos, GetKeyboard());
 	}
 }
 
@@ -479,15 +479,15 @@ void SceneNode::OnDragEnd(g2d::MouseButton button, const gml::coord& cursorPos)
 {
 	if (button == g2d::MouseButton::Left)
 	{
-		m_entity->OnLDragEnd(cursorPos, ::Keyboard::Instance);
+		m_entity->OnLDragEnd(cursorPos, GetKeyboard());
 	}
 	else if (button == g2d::MouseButton::Right)
 	{
-		m_entity->OnRDragEnd(cursorPos, ::Keyboard::Instance);
+		m_entity->OnRDragEnd(cursorPos, GetKeyboard());
 	}
 	else
 	{
-		m_entity->OnMDragEnd(cursorPos, ::Keyboard::Instance);
+		m_entity->OnMDragEnd(cursorPos, GetKeyboard());
 	}
 }
 
@@ -495,15 +495,15 @@ void SceneNode::OnDropping(::SceneNode* dropped, g2d::MouseButton button, const 
 {
 	if (button == g2d::MouseButton::Left)
 	{
-		m_entity->OnLDropping(dropped, cursorPos, ::Keyboard::Instance);
+		m_entity->OnLDropping(dropped, cursorPos, ::GetKeyboard());
 	}
 	else if (button == g2d::MouseButton::Right)
 	{
-		m_entity->OnRDropping(dropped, cursorPos, ::Keyboard::Instance);
+		m_entity->OnRDropping(dropped, cursorPos, GetKeyboard());
 	}
 	else
 	{
-		m_entity->OnMDropping(dropped, cursorPos, ::Keyboard::Instance);
+		m_entity->OnMDropping(dropped, cursorPos, GetKeyboard());
 	}
 }
 
@@ -511,24 +511,24 @@ void SceneNode::OnDropTo(::SceneNode* dropped, g2d::MouseButton button, const gm
 {
 	if (button == g2d::MouseButton::Left)
 	{
-		m_entity->OnLDropTo(dropped, cursorPos, ::Keyboard::Instance);
+		m_entity->OnLDropTo(dropped, cursorPos, GetKeyboard());
 	}
 	else if (button == g2d::MouseButton::Right)
 	{
-		m_entity->OnRDropTo(dropped, cursorPos, ::Keyboard::Instance);
+		m_entity->OnRDropTo(dropped, cursorPos, GetKeyboard());
 	}
 	else
 	{
-		m_entity->OnMDropTo(dropped, cursorPos, ::Keyboard::Instance);
+		m_entity->OnMDropTo(dropped, cursorPos, GetKeyboard());
 	}
 }
 
-void SceneNode::OnKeyPressing(g2d::KeyCode key, g2d::Keyboard& keyboard)
+void SceneNode::OnKeyPressing(g2d::KeyCode key)
 {
-	m_entity->OnKeyPressing(key, keyboard);
+	m_entity->OnKeyPressing(key, GetKeyboard());
 }
 
-void SceneNode::OnKeyPress(g2d::KeyCode key, g2d::Keyboard& keyboard)
+void SceneNode::OnKeyPress(g2d::KeyCode key)
 {
-	m_entity->OnKeyPress(key, keyboard);
+	m_entity->OnKeyPress(key, GetKeyboard());
 }

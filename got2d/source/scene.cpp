@@ -27,8 +27,8 @@ void Scene::RegisterKeyboardListener()
 		scene->OnKeyPressing(key);
 	};
 
-	::Keyboard::Instance.OnPress += m_pressReceiver;
-	::Keyboard::Instance.OnPressing += m_pressingReceiver;
+	GetKeyboard().OnPress += m_pressReceiver;
+	GetKeyboard().OnPressing += m_pressingReceiver;
 }
 
 void Scene::ResortCameraOrder()
@@ -82,7 +82,7 @@ void Scene::Update(uint32_t elapsedTime, uint32_t deltaTime)
 
 	if (m_canTickHovering && m_hoverNode != nullptr)
 	{
-		m_hoverNode->OnCursorHovering(cursorPos);
+		m_hoverNode->OnCursorHovering();
 		m_canTickHovering = false;
 	}
 	_Update(deltaTime);
@@ -216,7 +216,7 @@ bool Scene::MouseButtonState::OnMouseMove(const g2d::Message& message)
 		{
 			isPressing = false;
 		}
-		
+
 	}
 	else if (isDragging)
 	{
@@ -294,7 +294,6 @@ void Scene::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 	}
 	else if (message.Source == g2d::MessageSource::Mouse)
 	{
-		cursorPos.set(message.CursorPositionX, message.CursorPositionY);
 		bool handleMove = false;
 		for (auto& state : m_mouseButtonState)
 		{
@@ -325,7 +324,7 @@ void Scene::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 			{
 				if (m_hoverNode != nullptr && m_canTickHovering)
 				{
-					m_hoverNode->OnCursorHovering(gml::coord(message.CursorPositionX, message.CursorPositionY));
+					m_hoverNode->OnCursorHovering();
 					m_canTickHovering = false;
 				}
 			}
@@ -336,14 +335,14 @@ void Scene::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 void Scene::OnKeyPress(g2d::KeyCode key)
 {
 	TraversalChildren([&](::SceneNode* child) {
-		child->OnKeyPress(key, ::Keyboard::Instance);
+		child->OnKeyPress(key);
 	});
 }
 
 void Scene::OnKeyPressing(g2d::KeyCode key)
 {
 	TraversalChildren([&](::SceneNode* child) {
-		child->OnKeyPressing(key, ::Keyboard::Instance);
+		child->OnKeyPressing(key);
 	});
 }
 

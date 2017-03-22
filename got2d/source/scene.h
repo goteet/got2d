@@ -127,7 +127,7 @@ public:
 
 	void OnCursorEnterFrom(::SceneNode* adjacency, const gml::coord& cursorPos);
 
-	void OnCursorHovering(const gml::coord& cursorPos);
+	void OnCursorHovering();
 
 	void OnCursorLeaveTo(::SceneNode* adjacency, const gml::coord& cursorPos);
 
@@ -145,9 +145,9 @@ public:
 
 	void OnDropTo(::SceneNode* dropped, g2d::MouseButton button, const gml::coord& cursorPos);
 
-	void OnKeyPressing(g2d::KeyCode key, g2d::Keyboard& keyboard);
+	void OnKeyPressing(g2d::KeyCode key);
 
-	void OnKeyPress(g2d::KeyCode key, g2d::Keyboard& keyboard);
+	void OnKeyPress(g2d::KeyCode key);
 
 public:	//g2d::SceneNode
 	virtual g2d::Scene* GetScene() const override;
@@ -371,7 +371,6 @@ private:
 		::SceneNode* nodeDragging = nullptr;
 		::SceneNode* nodeHovering = nullptr;
 	} m_mouseButtonState[3];
-	gml::coord cursorPos;
 	::SceneNode* m_hoverNode = nullptr;	
 	bool m_canTickHovering = false;
 };
