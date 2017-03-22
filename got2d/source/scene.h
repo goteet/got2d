@@ -125,9 +125,11 @@ public:
 
 	void OnMessage(const g2d::Message& message);
 
-	void OnMouseEnterFrom(::SceneNode* adjacency, const gml::coord& cursorPos);
+	void OnCursorEnterFrom(::SceneNode* adjacency, const gml::coord& cursorPos);
 
-	void OnMouseLeaveTo(::SceneNode* adjacency, const gml::coord& cursorPos);
+	void OnCursorHovering(const gml::coord& cursorPos);
+
+	void OnCursorLeaveTo(::SceneNode* adjacency, const gml::coord& cursorPos);
 
 	void OnClick(g2d::MouseButton button, const gml::coord& cursorPos);
 
@@ -355,6 +357,7 @@ private:
 		void Update(uint32_t currentStamp);
 		bool OnMessage(const g2d::Message& message, uint32_t currentStamp, ::SceneNode* hitNode);
 		void ForceRelease();
+		bool IsHovering() const { return !isPressing && !isDragging; }
 	private:
 		void OnDoubleClick(const g2d::Message& message);
 		void OnMouseDown(const g2d::Message& message, uint32_t currentStamp);
@@ -368,5 +371,7 @@ private:
 		::SceneNode* nodeDragging = nullptr;
 		::SceneNode* nodeHovering = nullptr;
 	} m_mouseButtonState[3];
-	::SceneNode* m_hoverNode = nullptr;
+	gml::coord cursorPos;
+	::SceneNode* m_hoverNode = nullptr;	
+	bool m_canTickHovering = false;
 };

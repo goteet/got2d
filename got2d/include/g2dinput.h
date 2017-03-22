@@ -81,7 +81,7 @@ namespace g2d
 
 		Message(MessageEvent ev, g2d::MouseButton btn, uint32_t x, uint32_t y)
 			: Event(ev), Source(MessageSource::Mouse)
-			, MouseButton(btn), MousePositionX(x), MousePositionY(y)
+			, MouseButton(btn), CursorPositionX(x), CursorPositionY(y)
 		{		}
 
 		Message(MessageEvent ev, KeyCode key)
@@ -95,9 +95,9 @@ namespace g2d
 		// 光标事件信息
 		const MouseButton MouseButton = MouseButton::None;
 
-		const int MousePositionX = 0;
+		const int CursorPositionX = 0;
 
-		const int MousePositionY = 0;
+		const int CursorPositionY = 0;
 
 		// 键盘事件信息
 		const KeyCode Key = KeyCode::Invalid;
@@ -117,7 +117,7 @@ namespace g2d
 		// 根据鼠标信息构建Message
 		Message(const Message& m, int x, int y)
 			: Event(m.Event), Source(MessageSource::Mouse)
-			, MouseButton(m.MouseButton), MousePositionX(x), MousePositionY(y)
+			, MouseButton(m.MouseButton), CursorPositionX(x), CursorPositionY(y)
 		{		}
 
 		// 根据键盘信息构建Message

@@ -76,11 +76,18 @@ void Scene::Update(uint32_t elapsedTime, uint32_t deltaTime)
 	for (auto& state : m_mouseButtonState)
 	{
 		state.Update(elapsedTime);
+		if (!state.IsHovering())
+			m_canTickHovering = false;
 	}
 
-	//m_hoverNode->OnMouseHovering(deltaTime);
+	if (m_canTickHovering && m_hoverNode != nullptr)
+	{
+		m_hoverNode->OnCursorHovering(cursorPos);
+		m_canTickHovering = false;
+	}
 	_Update(deltaTime);
 	AdjustRenderingOrder();
+	m_canTickHovering = true;
 }
 
 void Scene::AdjustRenderingOrder()
@@ -135,7 +142,7 @@ void Scene::MouseButtonState::OnDoubleClick(const g2d::Message& message)
 	if (nodeHovering != nullptr)
 	{
 		nodeHovering->OnDoubleClick(message.MouseButton,
-			gml::coord(message.MousePositionX, message.MousePositionY));
+			gml::coord(message.CursorPositionX, message.CursorPositionY));
 	}
 }
 
@@ -145,7 +152,7 @@ void Scene::MouseButtonState::OnMouseDown(const g2d::Message& message, uint32_t 
 	{
 		isPressing = true;
 		pressTimeStamp = currentStamp;
-		pressCursorPos.set(message.MousePositionX, message.MousePositionY);
+		pressCursorPos.set(message.CursorPositionX, message.CursorPositionY);
 	}
 	else
 	{
@@ -160,18 +167,18 @@ bool Scene::MouseButtonState::OnMouseUp(const g2d::Message& message)
 		if (nodeHovering != nullptr && nodeHovering != nodeDragging)
 		{
 			nodeDragging->OnDropTo(nodeHovering, button,
-				gml::coord(message.MousePositionX, message.MousePositionY));
+				gml::coord(message.CursorPositionX, message.CursorPositionY));
 
-			nodeHovering->OnMouseEnterFrom(nodeDragging,
-				gml::coord(message.MousePositionX, message.MousePositionY));
+			nodeHovering->OnCursorEnterFrom(nodeDragging,
+				gml::coord(message.CursorPositionX, message.CursorPositionY));
 		}
 		else
 		{
 			nodeDragging->OnDragEnd(button,
-				gml::coord(message.MousePositionX, message.MousePositionY));
+				gml::coord(message.CursorPositionX, message.CursorPositionY));
 
-			nodeDragging->OnMouseEnterFrom(nodeDragging,
-				gml::coord(message.MousePositionX, message.MousePositionY));
+			nodeDragging->OnCursorEnterFrom(nodeDragging,
+				gml::coord(message.CursorPositionX, message.CursorPositionY));
 		}
 		isPressing = false;
 		isDragging = false;
@@ -181,7 +188,7 @@ bool Scene::MouseButtonState::OnMouseUp(const g2d::Message& message)
 	else if (isPressing)
 	{
 		nodeHovering->OnClick(button,
-			gml::coord(message.MousePositionX, message.MousePositionY));
+			gml::coord(message.CursorPositionX, message.CursorPositionY));
 		isPressing = false;
 		return true;
 	}
@@ -193,26 +200,35 @@ bool Scene::MouseButtonState::OnMouseMove(const g2d::Message& message)
 {
 	if (!isDragging && isPressing)
 	{
-		isDragging = true;
-		nodeDragging = nodeHovering;
-		nodeDragging->OnDragBegin(button,
-			gml::coord(message.MousePositionX, message.MousePositionY));
 
-		nodeDragging->OnDragging(button,
-			gml::coord(message.MousePositionX, message.MousePositionY));
-		return true;
+		if (nodeHovering != nullptr && isPressing)
+		{
+			isDragging = true;
+			nodeDragging = nodeHovering;
+			nodeDragging->OnDragBegin(button,
+				gml::coord(message.CursorPositionX, message.CursorPositionY));
+
+			nodeDragging->OnDragging(button,
+				gml::coord(message.CursorPositionX, message.CursorPositionY));
+			return true;
+		}
+		else
+		{
+			isPressing = false;
+		}
+		
 	}
 	else if (isDragging)
 	{
 		if (nodeHovering != nullptr && nodeHovering != nodeDragging)
 		{
 			nodeDragging->OnDropping(nodeHovering, button,
-				gml::coord(message.MousePositionX, message.MousePositionY));
+				gml::coord(message.CursorPositionX, message.CursorPositionY));
 		}
 		else
 		{
 			nodeDragging->OnDragging(button,
-				gml::coord(message.MousePositionX, message.MousePositionY));
+				gml::coord(message.CursorPositionX, message.CursorPositionY));
 		}
 		return true;
 	}
@@ -236,7 +252,7 @@ bool Scene::MouseButtonState::OnMessage(const g2d::Message& message, uint32_t cu
 			{
 				// 让上次的dragging事件正常结束
 				nodeDragging->OnDragEnd(button,
-					gml::coord(message.MousePositionX, message.MousePositionY));
+					gml::coord(message.CursorPositionX, message.CursorPositionY));
 
 				isDragging = false;
 				isPressing = false;
@@ -278,12 +294,14 @@ void Scene::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 	}
 	else if (message.Source == g2d::MessageSource::Mouse)
 	{
+		cursorPos.set(message.CursorPositionX, message.CursorPositionY);
 		bool handleMove = false;
 		for (auto& state : m_mouseButtonState)
 		{
 			if (state.OnMessage(message, currentTimeStamp, hitNode))
 			{
 				handleMove = true;
+				m_canTickHovering = true;
 			}
 		}
 
@@ -293,20 +311,23 @@ void Scene::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 			{
 				if (m_hoverNode != nullptr)
 				{
-					m_hoverNode->OnMouseLeaveTo(hitNode,
-						gml::coord(message.MousePositionX, message.MousePositionY));
+					m_hoverNode->OnCursorLeaveTo(hitNode,
+						gml::coord(message.CursorPositionX, message.CursorPositionY));
 				}
 				if (hitNode != nullptr)
 				{
-					hitNode->OnMouseEnterFrom(m_hoverNode,
-						gml::coord(message.MousePositionX, message.MousePositionY));
+					hitNode->OnCursorEnterFrom(m_hoverNode,
+						gml::coord(message.CursorPositionX, message.CursorPositionY));
 				}
 				m_hoverNode = hitNode;
 			}
 			else
 			{
-				// move inside 
-				// dont care
+				if (m_hoverNode != nullptr && m_canTickHovering)
+				{
+					m_hoverNode->OnCursorHovering(gml::coord(message.CursorPositionX, message.CursorPositionY));
+					m_canTickHovering = false;
+				}
 			}
 		}
 	}
@@ -335,8 +356,8 @@ void Scene::OnKeyPressing(g2d::KeyCode key)
 	{
 		::Camera* camera = *cur;
 
-		int coordX = message.MousePositionX;
-		int coordY = message.MousePositionY;
+		int coordX = message.CursorPositionX;
+		int coordY = message.CursorPositionY;
 		gml::vec2 worldCoord = camera->ScreenToWorld({ coordX, coordY });
 		auto entity = camera->FindIntersectionObject(worldCoord);
 		if (entity != nullptr)

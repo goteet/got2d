@@ -85,17 +85,25 @@ public:
 		}
 	}
 
-	virtual void OnMouseEnterFrom(g2d::SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	virtual void OnCursorEnterFrom(g2d::SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
 	{
 		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 		for (int i = 0; i < 7; i++)
 		{
 			colors[i] = vertices[i].vtxcolor;
+		}
+
+	}
+	virtual void OnCursorHovering(const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	{
+		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
+		for (int i = 0; i < 7; i++)
+		{
 			vertices[i].vtxcolor = gml::color4::red();
 		}
 	}
 
-	virtual void OnMouseLeaveTo(g2d::SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	virtual void OnCursorLeaveTo(g2d::SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
 	{
 		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 		for (int i = 0; i < 7; i++)

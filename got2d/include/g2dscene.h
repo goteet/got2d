@@ -51,12 +51,15 @@ namespace g2d
 		// 当光标碰到节点对象(Entity)的时候触发
 		// 参数是前一个光标悬停的对象
 		// 直接从未悬停状态下触碰对象时参数为空
-		virtual void OnMouseEnterFrom(SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnCursorEnterFrom(SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard&) { }
+
+		// 当光标悬停在物体上的时候持续触发
+		virtual void OnCursorHovering(const gml::coord& cursorPos, g2d::Keyboard&) { }
 
 		// 当光标离开节点对象(Entity)的时候触发
 		// 参数是当前光标悬停的对象
 		// 如果离开实体后光标没有触碰对象，此参数为空
-		virtual void OnMouseLeaveTo(SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnCursorLeaveTo(SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard&) { }
 
 		// 单击鼠标事件
 		virtual void OnLClick(const gml::coord& cursorPos, g2d::Keyboard&) { }
