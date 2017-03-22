@@ -1,5 +1,6 @@
 #include "input.h"
 #include <algorithm>
+#include <windows.h>
 
 bool KeyEventReceiver::operator==(const KeyEventReceiver& other) const
 {
@@ -44,22 +45,25 @@ Keyboard::~Keyboard()
 	m_states.clear();
 }
 
-bool Keyboard::IsPressing(g2d::KeyCode key)
+bool Keyboard::IsPressing(g2d::KeyCode key) const
 {
 	return GetState(key).IsPressing();
 }
 
-Keyboard::KeyState& Keyboard::GetState(g2d::KeyCode key)
+void Keyboard::CreateKeyState(g2d::KeyCode key)
+{
+	m_states.insert({ key, new KeyState(key) });
+	m_states[key]->OnPressing = [this](KeyState& state) { this->OnPressing.NotifyAll(state.Key); };
+	m_states[key]->OnPress = [this](KeyState& state) { this->OnPress.NotifyAll(state.Key); };
+}
+
+Keyboard::KeyState& Keyboard::GetState(g2d::KeyCode key) const
 {
 	if (m_states.count(key) == 0)
 	{
-		m_states.insert({ key, new KeyState(key) });
-
-		using namespace std::placeholders;
-		m_states[key]->OnPressing = [this](KeyState& state) { this->OnPressing.NotifyAll(state.Key); };
-		m_states[key]->OnPress = [this](KeyState& state) { this->OnPress.NotifyAll(state.Key); };
+		const_cast<Keyboard*>(this)->CreateKeyState(key);
 	}
-	return *(m_states[key]);
+	return *(m_states.at(key));
 }
 
 void Keyboard::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
@@ -77,7 +81,6 @@ void Keyboard::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 	}
 }
 
-#include <windows.h>
 void Keyboard::Update(uint32_t currentTimeStamp)
 {
 	auto ALTKey = g2d::KeyCode::Alt;
@@ -147,4 +150,19 @@ inline void Keyboard::KeyState::ForceRelease()
 bool Keyboard::VirtualKeyDown(uint32_t virtualKey)
 {
 	return (HIBYTE(GetKeyState(virtualKey)) & 0x80) != 0;
+}
+
+void Mouse::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
+{
+
+}
+
+bool Mouse::IsPressing(g2d::MouseButton button) const
+{
+	return false;
+}
+
+const gml::coord& Mouse::CursorPosition() const
+{
+	return m_cursorPosition;
 }

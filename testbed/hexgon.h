@@ -76,7 +76,7 @@ public:
 			GetSceneNode()->GetWorldMatrix());
 	}
 
-	virtual void OnLClick(const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	virtual void OnLClick(const gml::coord& cursorPos, const g2d::Keyboard& keyboard) override
 	{
 		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 		for (int i = 0; i < 7; i++)
@@ -85,7 +85,7 @@ public:
 		}
 	}
 
-	virtual void OnCursorEnterFrom(g2d::SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	virtual void OnCursorEnterFrom(g2d::SceneNode* adjacency, const gml::coord& cursorPos, const g2d::Keyboard& keyboard) override
 	{
 		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 		for (int i = 0; i < 7; i++)
@@ -94,7 +94,7 @@ public:
 		}
 
 	}
-	virtual void OnCursorHovering(const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	virtual void OnCursorHovering(const gml::coord& cursorPos, const g2d::Keyboard& keyboard) override
 	{
 		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 		for (int i = 0; i < 7; i++)
@@ -103,7 +103,7 @@ public:
 		}
 	}
 
-	virtual void OnCursorLeaveTo(g2d::SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	virtual void OnCursorLeaveTo(g2d::SceneNode* adjacency, const gml::coord& cursorPos, const g2d::Keyboard& keyboard) override
 	{
 		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 		for (int i = 0; i < 7; i++)
@@ -112,7 +112,7 @@ public:
 		}
 	}
 
-	virtual void OnLDoubleClick(const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	virtual void OnLDoubleClick(const gml::coord& cursorPos, const g2d::Keyboard& keyboard) override
 	{
 		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 		for (int i = 0; i < 7; i++)
@@ -121,7 +121,7 @@ public:
 		}
 	}
 
-	virtual void OnLDragBegin(const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	virtual void OnLDragBegin(const gml::coord& cursorPos, const g2d::Keyboard& keyboard) override
 	{
 		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 		for (int i = 0; i < 7; i++)
@@ -130,14 +130,14 @@ public:
 		}
 	}
 
-	virtual void OnLDragging(const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	virtual void OnLDragging(const gml::coord& cursorPos, const g2d::Keyboard& keyboard) override
 	{
 		auto worldP = GetSceneNode()->GetScene()->GetMainCamera()->ScreenToWorld(cursorPos);
 		auto parentP = GetSceneNode()->WorldToParent(worldP);
 		GetSceneNode()->SetPosition(parentP);
 	}
 
-	virtual void OnLDragEnd(const gml::coord& cursorPos, g2d::Keyboard& keyboard) override
+	virtual void OnLDragEnd(const gml::coord& cursorPos, const g2d::Keyboard& keyboard) override
 	{
 		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 		for (int i = 0; i < 7; i++)
@@ -146,7 +146,7 @@ public:
 		}
 	}
 
-	virtual void OnKeyPress(g2d::KeyCode key, g2d::Keyboard& keyboard) override
+	virtual void OnKeyPress(g2d::KeyCode key, const g2d::Keyboard& keyboard) override
 	{
 		if ((int)key == 'C')
 		{

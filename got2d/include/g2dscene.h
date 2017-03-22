@@ -51,57 +51,57 @@ namespace g2d
 		// 当光标碰到节点对象(Entity)的时候触发
 		// 参数是前一个光标悬停的对象
 		// 直接从未悬停状态下触碰对象时参数为空
-		virtual void OnCursorEnterFrom(SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnCursorEnterFrom(SceneNode* adjacency, const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
 		// 当光标悬停在物体上的时候持续触发
-		virtual void OnCursorHovering(const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnCursorHovering(const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
 		// 当光标离开节点对象(Entity)的时候触发
 		// 参数是当前光标悬停的对象
 		// 如果离开实体后光标没有触碰对象，此参数为空
-		virtual void OnCursorLeaveTo(SceneNode* adjacency, const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnCursorLeaveTo(SceneNode* adjacency, const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
 		// 单击鼠标事件
-		virtual void OnLClick(const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnRClick(const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnMClick(const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnLClick(const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnRClick(const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnMClick(const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
 		// 双击鼠标的事件
-		virtual void OnLDoubleClick(const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnRDoubleClick(const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnMDoubleClick(const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnLDoubleClick(const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnRDoubleClick(const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnMDoubleClick(const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
 		// 光标拖拽开始
-		virtual void OnLDragBegin(const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnRDragBegin(const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnMDragBegin(const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnLDragBegin(const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnRDragBegin(const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnMDragBegin(const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
 		// 没有触碰到别的物体的时候，光标拖拽中
-		virtual void OnLDragging(const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnRDragging(const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnMDragging(const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnLDragging(const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnRDragging(const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnMDragging(const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
 		// 没有触碰到别的物体的时候，鼠标拖拽结时
-		virtual void OnLDragEnd(const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnRDragEnd(const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnMDragEnd(const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnLDragEnd(const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnRDragEnd(const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnMDragEnd(const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
 		// 光标触碰到别的物体的时候，鼠标拖拽中
 		// 如果dropped 是空的话，会把消息转发到OnDragging
-		virtual void OnLDropping(SceneNode* dropped, const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnRDropping(SceneNode* dropped, const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnMDropping(SceneNode* dropped, const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnLDropping(SceneNode* dropped, const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnRDropping(SceneNode* dropped, const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnMDropping(SceneNode* dropped, const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
 		// 光标触碰到别的物体的时候，鼠标拖拽结束
-		virtual void OnLDropTo(SceneNode* dropped, const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnRDropTo(SceneNode* dropped, const gml::coord& cursorPos, g2d::Keyboard&) { }
-		virtual void OnMDropTo(SceneNode* dropped, const gml::coord& cursorPos, g2d::Keyboard&) { }
+		virtual void OnLDropTo(SceneNode* dropped, const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnRDropTo(SceneNode* dropped, const gml::coord& cursorPos, const g2d::Keyboard&) { }
+		virtual void OnMDropTo(SceneNode* dropped, const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
 		// 键位被持续按下
-		virtual void OnKeyPressing(KeyCode key, g2d::Keyboard& keyboard) { }
+		virtual void OnKeyPressing(KeyCode key, const g2d::Keyboard& keyboard) { }
 
 		// 键位被触发，与持续按下的情况互斥
-		virtual void OnKeyPress(KeyCode key, g2d::Keyboard& keyboard) { }
+		virtual void OnKeyPress(KeyCode key, const g2d::Keyboard& keyboard) { }
 	};
 
 	// 实体基类，节点逻辑的实现全在entity内

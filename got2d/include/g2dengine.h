@@ -1,6 +1,6 @@
 #pragma once
 #include <g2dconfig.h>
-#include <g2dinput.h>
+#include <g2dmessage.h>
 
 namespace g2d
 {

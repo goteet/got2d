@@ -1,6 +1,6 @@
 #pragma once
 #include <gmlrect.h>
-#include <g2dinput.h>
+#include <g2dmessage.h>
 #include <functional>
 #include <string>
 #include <cinttypes>

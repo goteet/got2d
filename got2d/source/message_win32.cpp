@@ -1,4 +1,4 @@
-#include "../include/g2dinput.h"
+#include "../include/g2dmessage.h"
 #include <map>
 #include <Windows.h>
 #include <Windowsx.h>
@@ -27,6 +27,7 @@ struct Mapping
 			return g2d::KeyCode::Invalid;
 		return m_keyMapping.at(vkey);
 	}
+
 private:
 	void RegisterMessageMapping()
 	{
@@ -134,7 +135,7 @@ private:
 		for (uint32_t key = '0'; key <= '9'; key++)
 		{
 			RegisterKeyCode(key, g2d::KeyCode(key));
-			RegisterKeyCode(key + g2d::NumpadOffset, g2d::KeyCode(key + g2d::NumpadOffset));
+			RegisterKeyCode(key + g2d::NUMPAD_OFFSET, g2d::KeyCode(key + g2d::NUMPAD_OFFSET));
 		}
 		RegisterKeyCode(VK_NUMLOCK, g2d::KeyCode::NumpadLock);
 		RegisterKeyCode(VK_DECIMAL, g2d::KeyCode::NumpadDecimal);
@@ -179,7 +180,7 @@ private:
 
 namespace g2d
 {
-	Message G2DAPI TranslateMessageFromWin32(uint32_t message, uint32_t wparam, uint32_t lparam)
+	Message G2DAPI TranslateMessageWin32(uint32_t message, uint32_t wparam, uint32_t lparam)
 	{
 		static const Mapping mapping;
 		if (mapping.ExistMessage(message))

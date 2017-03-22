@@ -59,6 +59,9 @@
     <ClInclude Include="source\input.h">
       <Filter>源文件\input</Filter>
     </ClInclude>
+    <ClInclude Include="include\g2dmessage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\engine.cpp">
@@ -92,6 +95,9 @@
       <Filter>源文件\scene</Filter>
     </ClCompile>
     <ClCompile Include="source\input.cpp">
+      <Filter>源文件\input</Filter>
+    </ClCompile>
+    <ClCompile Include="source\message.cpp">
       <Filter>源文件\input</Filter>
     </ClCompile>
   </ItemGroup>

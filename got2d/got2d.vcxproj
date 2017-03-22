@@ -169,6 +169,7 @@
     <ClInclude Include="include\g2dconfig.h" />
     <ClInclude Include="include\g2dengine.h" />
     <ClInclude Include="include\g2dinput.h" />
+    <ClInclude Include="include\g2dmessage.h" />
     <ClInclude Include="include\g2drender.h" />
     <ClInclude Include="include\g2dscene.h" />
     <ClInclude Include="source\engine.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="source\entity.cpp" />
     <ClCompile Include="source\input.cpp" />
     <ClCompile Include="source\mesh.cpp" />
+    <ClCompile Include="source\message.cpp" />
     <ClCompile Include="source\message_win32.cpp" />
     <ClCompile Include="source\render_system.cpp" />
     <ClCompile Include="source\scene.cpp" />

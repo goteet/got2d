@@ -4,7 +4,7 @@
 #include <time.h>
 #include <g2dengine.h>
 #include <g2drender.h>
-#include <g2dinput.h>
+#include <g2dmessage.h>
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -314,7 +314,7 @@ void Framework::OnWindowResize(uint32_t width, uint32_t height)
 
 void Framework::OnWindowMessage(uint32_t m, uint32_t wp, uint32_t lp)
 {
-	g2d::Message message = g2d::TranslateMessageFromWin32(m, wp, lp);
+	g2d::Message message = g2d::TranslateMessageWin32(m, wp, lp);
 	OnMessageInternal(message);
 }
 

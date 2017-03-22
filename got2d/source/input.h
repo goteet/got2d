@@ -1,6 +1,6 @@
 #pragma once
-#include <g2dinput.h>
 #include <gmlrect.h>
+#include <g2dinput.h>
 #include <functional>
 #include <map>
 #include <vector>
@@ -28,7 +28,7 @@ private:
 class Keyboard : public g2d::Keyboard
 {
 public:
-	virtual bool IsPressing(g2d::KeyCode key) override;
+	virtual bool IsPressing(g2d::KeyCode key) const override;
 
 public:
 	static Keyboard Instance;
@@ -54,14 +54,29 @@ private:
 	public:
 		const g2d::KeyCode Key;
 		KeyState(g2d::KeyCode key) : Key(key) { }
-		bool IsPressing() { return pressState != State::Releasing; }
+		bool IsPressing() const { return pressState != State::Releasing; }
 		void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
 		void Update(uint32_t currentTimeStamp);
 		void ForceRelease();
 		std::function<void(KeyState&)> OnPressing = nullptr;
 		std::function<void(KeyState&)> OnPress = nullptr;
 	};
-	KeyState& GetState(g2d::KeyCode key);
+	KeyState& GetState(g2d::KeyCode key) const;
+	void CreateKeyState(g2d::KeyCode key);
 	bool VirtualKeyDown(uint32_t virtualKey);
 	std::map<g2d::KeyCode, KeyState*> m_states;
+};
+
+class Mouse : public g2d::Mouse
+{
+public:	//g2d::Mouse
+	virtual bool IsPressing(g2d::MouseButton button) const override;
+
+	virtual const gml::coord& CursorPosition() const override;
+
+public:
+	void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
+
+private:
+	gml::coord m_cursorPosition;
 };
