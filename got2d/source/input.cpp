@@ -1,41 +1,33 @@
 #include "input.h"
 #include <algorithm>
 
-void KeyEventDelegate::operator+=(const KeyEventReceiver& listener)
+bool KeyEventReceiver::operator==(const KeyEventReceiver& other) const
 {
-	auto itFind = std::find_if(std::begin(m_listeners), std::end(m_listeners), [&](const KeyEventReceiver& l) {
-		return (listener.UserData == l.UserData && listener.Functor == l.Functor);
-	});
+	return (UserData == other.UserData && Functor == other.Functor);
+}
 
-	if (itFind == std::end(m_listeners))
+void KeyEventDelegate::operator+=(const KeyEventReceiver& receiver)
+{
+	auto itFind = std::find(std::begin(m_receivers), std::end(m_receivers), receiver);
+
+	if (itFind == std::end(m_receivers))
 	{
-		m_listeners.push_back(listener);
+		m_receivers.push_back(receiver);
 	}
 }
 
-void KeyEventDelegate::operator-=(const KeyEventReceiver& listener)
+void KeyEventDelegate::operator-=(const KeyEventReceiver& receiver)
 {
-	auto itFind = std::find_if(std::begin(m_listeners), std::end(m_listeners), [&](const KeyEventReceiver& l) {
-		return (listener.UserData == l.UserData && listener.Functor == l.Functor);
-	});
-
-	if (itFind != std::end(m_listeners))
+	auto itFind = std::find(std::begin(m_receivers), std::end(m_receivers), receiver);
+	if (itFind != std::end(m_receivers))
 	{
-		m_listeners.erase(itFind);
+		m_receivers.erase(itFind);
 	}
 }
 
-void KeyEventDelegate::SetPressing(g2d::KeyCode key)
+void KeyEventDelegate::NotifyAll(g2d::KeyCode key) const
 {
-	for (auto& listener : m_listeners)
-	{
-		listener.Functor(listener.UserData, key);
-	}
-}
-
-void KeyEventDelegate::SetPress(g2d::KeyCode key)
-{
-	for (auto& listener : m_listeners)
+	for (auto& listener : m_receivers)
 	{
 		listener.Functor(listener.UserData, key);
 	}
@@ -57,16 +49,6 @@ bool Keyboard::IsPressing(g2d::KeyCode key)
 	return GetState(key).IsPressing();
 }
 
-void Keyboard::OnKeyPressing(KeyState & state)
-{
-	OnPressing.SetPressing(state.Key);
-}
-
-void Keyboard::OnKeyPress(KeyState & state)
-{
-	OnPress.SetPress(state.Key);
-}
-
 Keyboard::KeyState& Keyboard::GetState(g2d::KeyCode key)
 {
 	if (m_states.count(key) == 0)
@@ -74,8 +56,8 @@ Keyboard::KeyState& Keyboard::GetState(g2d::KeyCode key)
 		m_states.insert({ key, new KeyState(key) });
 
 		using namespace std::placeholders;
-		m_states[key]->OnPressing = [&](KeyState& state) { OnKeyPressing(state); };
-		m_states[key]->OnPress = [&](KeyState& state) { OnKeyPress(state); };
+		m_states[key]->OnPressing = [this](KeyState& state) { this->OnPressing.NotifyAll(state.Key); };
+		m_states[key]->OnPress = [this](KeyState& state) { this->OnPress.NotifyAll(state.Key); };
 	}
 	return *(m_states[key]);
 }

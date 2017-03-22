@@ -353,8 +353,8 @@ private:
 
 		MouseButtonState(g2d::MouseButton btn) : button(btn) { }
 		void Update(uint32_t currentStamp);
-		bool UpdateMessage(const g2d::Message& message, uint32_t currentStamp, ::SceneNode* hitNode);
-		void LostFocus();
+		bool OnMessage(const g2d::Message& message, uint32_t currentStamp, ::SceneNode* hitNode);
+		void ForceRelease();
 	private:
 		void OnDoubleClick(const g2d::Message& message);
 		void OnMouseDown(const g2d::Message& message, uint32_t currentStamp);

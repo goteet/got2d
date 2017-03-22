@@ -11,7 +11,8 @@ constexpr uint32_t PRESSING_INTERVAL = 700u;
 struct KeyEventReceiver
 {
 	void* UserData = nullptr;
-	void(*Functor)(void* userData, g2d::KeyCode Key) = nullptr;
+	void(*Functor)(void* userData, g2d::KeyCode key) = nullptr;
+	bool operator==(const KeyEventReceiver& other) const;
 };
 
 class KeyEventDelegate
@@ -19,11 +20,9 @@ class KeyEventDelegate
 public:
 	void operator+=(const KeyEventReceiver&);
 	void operator-=(const KeyEventReceiver&);
-	void SetPressing(g2d::KeyCode key);
-	void SetPress(g2d::KeyCode key);
-
+	void NotifyAll(g2d::KeyCode key) const;
 private:
-	std::vector<KeyEventReceiver> m_listeners;
+	std::vector<KeyEventReceiver> m_receivers;
 };
 
 class Keyboard : public g2d::Keyboard
@@ -62,8 +61,6 @@ private:
 		std::function<void(KeyState&)> OnPressing = nullptr;
 		std::function<void(KeyState&)> OnPress = nullptr;
 	};
-	void OnKeyPressing(KeyState& state);
-	void OnKeyPress(KeyState& state);
 	KeyState& GetState(g2d::KeyCode key);
 	bool VirtualKeyDown(uint32_t virtualKey);
 	std::map<g2d::KeyCode, KeyState*> m_states;

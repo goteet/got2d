@@ -106,7 +106,7 @@ void Scene::MouseButtonState::Update(uint32_t currentStamp)
 	}
 }
 
-void Scene::MouseButtonState::LostFocus()
+void Scene::MouseButtonState::ForceRelease()
 {
 	if (isDragging)
 	{
@@ -219,7 +219,7 @@ bool Scene::MouseButtonState::OnMouseMove(const g2d::Message& message)
 	return false;
 }
 
-bool Scene::MouseButtonState::UpdateMessage(const g2d::Message& message, uint32_t currentStamp, ::SceneNode* hitNode)
+bool Scene::MouseButtonState::OnMessage(const g2d::Message& message, uint32_t currentStamp, ::SceneNode* hitNode)
 {
 	nodeHovering = hitNode;
 	bool sameButton = message.MouseButton == button;
@@ -274,14 +274,14 @@ void Scene::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 	if (message.Event == g2d::MessageEvent::LostFocus)
 	{
 		for (auto& state : m_mouseButtonState)
-			state.LostFocus();
+			state.ForceRelease();
 	}
 	else if (message.Source == g2d::MessageSource::Mouse)
 	{
 		bool handleMove = false;
 		for (auto& state : m_mouseButtonState)
 		{
-			if (state.UpdateMessage(message, currentTimeStamp, hitNode))
+			if (state.OnMessage(message, currentTimeStamp, hitNode))
 			{
 				handleMove = true;
 			}
