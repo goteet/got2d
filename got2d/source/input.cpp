@@ -49,7 +49,7 @@ Keyboard::~Keyboard()
 
 g2d::SwitchState Keyboard::PressState(g2d::KeyCode key) const
 {
-	return GetState(key).PressState();
+	return GetState(key).State();
 }
 
 void Keyboard::CreateKeyState(g2d::KeyCode key)
@@ -88,7 +88,7 @@ void Keyboard::Update(uint32_t currentTimeStamp)
 	auto ALTKey = g2d::KeyCode::Alt;
 	auto ALTDown = VirtualKeyDown(VK_MENU);
 	auto& ALTState = GetState(ALTKey);
-	bool ALTPressing = ALTState.PressState() != g2d::SwitchState::Releasing;
+	bool ALTPressing = ALTState.State() != g2d::SwitchState::Releasing;
 	if (ALTDown && !ALTPressing)
 	{
 		ALTState.OnMessage(g2d::Message(g2d::MessageEvent::KeyDown, ALTKey), currentTimeStamp);
@@ -107,35 +107,35 @@ void Keyboard::KeyState::OnMessage(const g2d::Message& message, uint32_t current
 {
 	if (message.Event == g2d::MessageEvent::KeyDown)
 	{
-		if (pressState != g2d::SwitchState::Releasing)
+		if (state != g2d::SwitchState::Releasing)
 		{
 			//�쳣״̬
 		}
 
-		pressState = g2d::SwitchState::JustPressed;
+		state = g2d::SwitchState::JustPressed;
 		pressTimeStamp = currentTimeStamp;
 	}
 	else if (message.Event == g2d::MessageEvent::KeyUp)
 	{
-		if (pressState == g2d::SwitchState::JustPressed)
+		if (state == g2d::SwitchState::JustPressed)
 		{
 			OnPress(*this);
 		}
-		else if (pressState == g2d::SwitchState::Releasing)
+		else if (state == g2d::SwitchState::Releasing)
 		{
 			//�쳣״̬
 		}
-		pressState = g2d::SwitchState::Releasing;
+		state = g2d::SwitchState::Releasing;
 	}
 }
 
 void Keyboard::KeyState::Update(uint32_t currentTimeStamp)
 {
-	if (pressState == g2d::SwitchState::JustPressed && (currentTimeStamp - pressTimeStamp) > PRESSING_INTERVAL)
+	if (state == g2d::SwitchState::JustPressed && (currentTimeStamp - pressTimeStamp) > PRESSING_INTERVAL)
 	{
-		pressState = g2d::SwitchState::Pressing;
+		state = g2d::SwitchState::Pressing;
 	}
-	if (pressState == g2d::SwitchState::Pressing)
+	if (state == g2d::SwitchState::Pressing)
 	{
 		OnPressing(*this);
 	}
@@ -143,11 +143,11 @@ void Keyboard::KeyState::Update(uint32_t currentTimeStamp)
 
 inline void Keyboard::KeyState::ForceRelease()
 {
-	if (pressState == g2d::SwitchState::JustPressed)
+	if (state == g2d::SwitchState::JustPressed)
 	{
 		OnPress(*this);
 	}
-	pressState = g2d::SwitchState::Releasing;
+	state = g2d::SwitchState::Releasing;
 }
 
 bool Keyboard::VirtualKeyDown(uint32_t virtualKey)
@@ -155,11 +155,36 @@ bool Keyboard::VirtualKeyDown(uint32_t virtualKey)
 	return (HIBYTE(GetKeyState(virtualKey)) & 0x80) != 0;
 }
 
+Mouse::Mouse()
+	: m_buttons{ g2d::MouseButton::Left, g2d::MouseButton::Right, g2d::MouseButton::Middle }
+{
+
+}
+
 void Mouse::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 {
 	if (message.Source == g2d::MessageSource::Mouse)
 	{
+		for (auto& button : m_buttons)
+		{
+			button.OnMessage(message, currentTimeStamp);
+		}
 		m_cursorPosition.set(message.CursorPositionX, message.CursorPositionY);
+	}
+	else if (message.Event == g2d::MessageEvent::LostFocus)
+	{
+		for (auto& button : m_buttons)
+		{
+			//button.ForceRelease();
+		}
+	}
+}
+
+void Mouse::Update(uint32_t currentTimeStamp)
+{
+	for (auto& button : m_buttons)
+	{
+		button.Update(currentTimeStamp);
 	}
 }
 
@@ -171,4 +196,14 @@ g2d::SwitchState Mouse::PressState(g2d::MouseButton button) const
 const gml::coord& Mouse::CursorPosition() const
 {
 	return m_cursorPosition;
+}
+
+void Mouse::ButtonState::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
+{
+
+}
+
+void Mouse::ButtonState::Update(uint32_t currentTimeStamp)
+{
+
 }

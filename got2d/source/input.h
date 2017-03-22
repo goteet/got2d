@@ -45,12 +45,14 @@ public:
 private:
 	class KeyState
 	{
-		g2d::SwitchState pressState = g2d::SwitchState::Releasing;
 		uint32_t pressTimeStamp;
+		g2d::SwitchState state = g2d::SwitchState::Releasing;
 	public:
 		const g2d::KeyCode Key;
+
+		g2d::SwitchState State() const { return state; }
+
 		KeyState(g2d::KeyCode key) : Key(key) { }
-		g2d::SwitchState PressState() const { return pressState; }
 		void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
 		void Update(uint32_t currentTimeStamp);
 		void ForceRelease();
@@ -68,7 +70,11 @@ class Mouse : public g2d::Mouse
 public:
 	static Mouse Instance;
 
+	Mouse();
+
 	void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
+
+	void Update(uint32_t currentTimeStamp);
 
 public:	//g2d::Mouse
 	virtual g2d::SwitchState PressState(g2d::MouseButton button) const override;
@@ -76,6 +82,22 @@ public:	//g2d::Mouse
 	virtual const gml::coord& CursorPosition() const override;
 
 private:
+	class ButtonState
+	{
+		uint32_t pressTimeStamp;
+		gml::coord pressPos;
+		g2d::SwitchState state = g2d::SwitchState::Releasing;
+	public:
+		const g2d::MouseButton Button;
+
+		g2d::SwitchState State() const { return state; }
+
+		const gml::coord& PressPos() const { return pressPos; }
+
+		ButtonState(g2d::MouseButton btn) : Button(btn) { }
+		void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
+		void Update(uint32_t currentTimeStamp);
+	} m_buttons[3];
 	gml::coord m_cursorPosition;
 };
 

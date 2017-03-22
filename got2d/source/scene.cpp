@@ -67,8 +67,8 @@ void Scene::Release()
 
 void Scene::UnRegisterKeyboardListener()
 {
-	::Keyboard::Instance.OnPress -= m_pressReceiver;
-	::Keyboard::Instance.OnPressing -= m_pressingReceiver;
+	GetKeyboard().OnPress -= m_pressReceiver;
+	GetKeyboard().OnPressing -= m_pressingReceiver;
 }
 
 void Scene::Update(uint32_t elapsedTime, uint32_t deltaTime)

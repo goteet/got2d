@@ -78,7 +78,8 @@ void Engine::Update(uint32_t deltaTime)
 {
 	m_elapsedTime += deltaTime;
 
-	Keyboard::Instance.Update(m_elapsedTime);
+	GetKeyboard().Update(m_elapsedTime);
+	GetMouse().Update(m_elapsedTime);
 
 	for (auto& scene : m_scenes)
 	{
@@ -88,8 +89,8 @@ void Engine::Update(uint32_t deltaTime)
 
 void Engine::OnMessage(const g2d::Message& message)
 {
-	Keyboard::Instance.OnMessage(message, m_elapsedTime);
-	Mouse::Instance.OnMessage(message, m_elapsedTime);
+	GetKeyboard().OnMessage(message, m_elapsedTime);
+	GetMouse().OnMessage(message, m_elapsedTime);
 
 	for (auto& scene : m_scenes)
 	{
