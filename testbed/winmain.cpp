@@ -5,6 +5,7 @@
 namespace g2d
 {
 	class Scene;
+	class SceneNode;
 }
 
 class Testbed
@@ -18,6 +19,8 @@ public:
 private:
 	g2d::Scene* mainScene = nullptr;
 	Framework& framework;
+	g2d::SceneNode* following = nullptr;
+	g2d::SceneNode* hexgonNode = nullptr;
 };
 
 
@@ -53,8 +56,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #include <g2drender.h>
 #include <g2dscene.h>
 
-g2d::SceneNode* firstNode = nullptr;
-g2d::SceneNode* lastNode = nullptr;
 void Testbed::Start()
 {
 	mainScene = g2d::GetEngine()->CreateNewScene(2 << 10);
@@ -74,7 +75,7 @@ void Testbed::Start()
 
 		node = child;
 	}
-	lastNode = node;
+	following = node;
 
 	auto mainCamera = mainScene->GetMainCamera();
 	mainCamera->SetActivity(true);
@@ -102,9 +103,8 @@ void Testbed::Start()
 	}
 
 	Hexgon* hexgonEntity = new Hexgon();
-	auto hexgonNode = mainScene->CreateSceneNodeChild(hexgonEntity, true);
+	hexgonNode = mainScene->CreateSceneNodeChild(hexgonEntity, true);
 	hexgonNode->SetPosition({ 0,0 });
-	firstNode = hexgonNode;
 }
 
 void Testbed::End()
@@ -120,21 +120,21 @@ bool Testbed::Update(uint32_t deltaTime)
 		auto mainCamera = mainScene->GetMainCamera();
 		if (0)
 		{
-			auto mouseP = framework.GetCursorPos();
-			auto p = mainCamera->ScreenToWorld(mouseP);
-			firstNode->SetPosition(p);
+			auto cursorPos = framework.GetCursorPos();
+			auto worldPos = mainCamera->ScreenToWorld(cursorPos);
+			hexgonNode->SetPosition(worldPos);
 		}
 		else if (0)
 		{
-			auto p = mainCamera->WorldToScreen(lastNode->GetWorldPosition());
+			auto p = mainCamera->WorldToScreen(following->GetWorldPosition());
 			framework.SetCursorPos(p);
 		}
 		else if (0)
 		{
-			auto mouseP = framework.GetCursorPos();
-			auto p = mainCamera->ScreenToWorld(mouseP);
-			p = lastNode->WorldToParent(p);
-			lastNode->SetPosition(p);
+			auto cursorPos = framework.GetCursorPos();
+			auto parentPos = mainCamera->ScreenToWorld(cursorPos);
+			parentPos = following->WorldToParent(parentPos);
+			following->SetPosition(parentPos);
 		}
 	}
 

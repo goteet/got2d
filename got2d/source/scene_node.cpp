@@ -7,7 +7,6 @@ BaseNode::BaseNode()
 	, m_pivot(gml::vec2::zero())
 	, m_scale(gml::vec2::one())
 	, m_rotation(0)
-	, m_isVisible(true)
 	, m_matrixLocal(gml::mat32::identity())
 { }
 

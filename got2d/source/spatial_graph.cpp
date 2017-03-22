@@ -106,8 +106,8 @@ QuadTreeNode* QuadTreeNode::AddRecursive(const gml::aabb2d& entityBound, g2d::En
 
 QuadTreeNode* QuadTreeNode::AddToDynamicList(g2d::Entity& entity)
 {
-	m_dynamicEntities.push_back(&entity);
 	m_isEmpty = false;
+	m_dynamicEntities.push_back(&entity);
 	return this;
 }
 
@@ -115,9 +115,8 @@ void QuadTreeNode::TryMarkEmpty()
 {
 	if (m_dynamicEntities.size() > 0)
 	{
-
-	}
 		return;
+	}
 
 	bool hasEntities = false;
 	for (auto child : m_directionNodes)
@@ -189,6 +188,7 @@ void SpatialGraph::Add(g2d::Entity& entity)
 	}
 	else
 	{
+		//m_root->m_isEmpty = false;
 		node = m_root->AddToDynamicList(entity);
 	}
 	m_linkRef[&entity] = node;

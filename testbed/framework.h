@@ -62,5 +62,5 @@ private:
 	uint32_t m_tickInterval;
 	bool m_running = true;
 	bool m_initial = false;
-	bool m_firstTick = false;
+	std::function<void(const g2d::Message& message)> OnMessageInternal;
 };
