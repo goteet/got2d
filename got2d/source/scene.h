@@ -2,8 +2,10 @@
 #include "../include/g2dscene.h"
 #include "entity.h"
 #include "spatial_graph.h"
+#include "input.h"
 #include <gmlmatrix.h>
 #include <vector>
+
 
 class SpatialGraph;
 class SceneNode;
@@ -123,23 +125,27 @@ public:
 
 	void OnMessage(const g2d::Message& message);
 
-	void OnMouseEnterFrom(::SceneNode* adjacency, const gml::coord& cursorPos, bool ctrl, bool shift, bool alt);
+	void OnMouseEnterFrom(::SceneNode* adjacency, const gml::coord& cursorPos);
 
-	void OnMouseLeaveTo(::SceneNode* adjacency, const gml::coord& cursorPos, bool ctrl, bool shift, bool alt);
+	void OnMouseLeaveTo(::SceneNode* adjacency, const gml::coord& cursorPos);
 
-	void OnClick(g2d::MouseButton button, const gml::coord& cursorPos, bool ctrl, bool shift, bool alt);
+	void OnClick(g2d::MouseButton button, const gml::coord& cursorPos);
 
-	void OnDoubleClick(g2d::MouseButton button, const gml::coord& cursorPos, bool ctrl, bool shift, bool alt);
+	void OnDoubleClick(g2d::MouseButton button, const gml::coord& cursorPos);
 
-	void OnDragBegin(g2d::MouseButton button, const gml::coord& cursorPos, bool ctrl, bool shift, bool alt);
+	void OnDragBegin(g2d::MouseButton button, const gml::coord& cursorPos);
 
-	void OnDragging(g2d::MouseButton button, const gml::coord& cursorPos, bool ctrl, bool shift, bool alt);
+	void OnDragging(g2d::MouseButton button, const gml::coord& cursorPos);
 
-	void OnDragEnd(g2d::MouseButton button, const gml::coord& cursorPos, bool ctrl, bool shift, bool alt);
+	void OnDragEnd(g2d::MouseButton button, const gml::coord& cursorPos);
 
-	void OnDropping(::SceneNode* dropped, g2d::MouseButton button, const gml::coord& cursorPos, bool ctrl, bool shift, bool alt);
+	void OnDropping(::SceneNode* dropped, g2d::MouseButton button, const gml::coord& cursorPos);
 
-	void OnDropTo(::SceneNode* dropped, g2d::MouseButton button, const gml::coord& cursorPos, bool ctrl, bool shift, bool alt);
+	void OnDropTo(::SceneNode* dropped, g2d::MouseButton button, const gml::coord& cursorPos);
+
+	void OnKeyPressing(g2d::KeyCode key, g2d::Keyboard& keyboard);
+
+	void OnKeyPress(g2d::KeyCode key, g2d::Keyboard& keyboard);
 
 public:	//g2d::SceneNode
 	virtual g2d::Scene* GetScene() const override;
@@ -314,14 +320,26 @@ public:	//g2d::Scene
 
 	virtual void Render() override;
 
+private:	//BaseNode
+	virtual ::BaseNode* _GetParent() override { return nullptr; }
+
+	virtual void AdjustRenderingOrder() override;
+
 private:
 	void ResortCameraOrder();
 
 	::SceneNode* FindInteractiveObject(const g2d::Message& message);
 
-	virtual ::BaseNode* _GetParent() override { return nullptr; }
+	void RegisterKeyboardListener();
 
-	virtual void AdjustRenderingOrder() override;
+	void UnRegisterKeyboardListener();
+
+	void OnKeyPress(g2d::KeyCode key);
+
+	void OnKeyPressing(g2d::KeyCode key);
+
+	KeyEventReceiver m_pressReceiver;
+	KeyEventReceiver m_pressingReceiver;
 
 	SpatialGraph m_spatial;
 	std::vector<::Camera*> m_cameras;
@@ -343,9 +361,6 @@ private:
 		bool OnMouseUp(const g2d::Message& message);
 		bool OnMouseMove(const g2d::Message& message);
 
-		bool control = false;	//临时的记录上一个消息的按键
-		bool shift = false;		//临时的记录上一个消息的按键
-		bool alt = false;		//临时的记录上一个消息的按键
 		bool isDragging = false;
 		bool isPressing = false;
 		uint32_t pressTimeStamp;

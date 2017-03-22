@@ -88,10 +88,6 @@ private:
 	msg_map_ m_mapping;
 };
 
-bool Ctrl() { return (HIBYTE(GetKeyState(VK_CONTROL)) & 0x80) != 0; }
-bool Shift() { return (HIBYTE(GetKeyState(VK_SHIFT)) & 0x80) != 0; }
-bool Alt() { return (HIBYTE(GetKeyState(VK_MENU)) & 0x80) != 0; }
-
 namespace g2d
 {
 	Message G2DAPI TranslateMessageFromWin32(uint32_t message, uint32_t wparam, uint32_t lparam)
@@ -115,13 +111,13 @@ namespace g2d
 				int y = GET_Y_LPARAM(lparam);
 				bool ctrl = (wparam & MK_CONTROL) != 0;
 				bool shift = (wparam & MK_SHIFT) != 0;
-				return Message(msg, ctrl, shift, Alt(), x, y);
+				return Message(msg, x, y);
 			}
 
 			case MessageSource::Keyboard:
 			{
 				int key = wparam;
-				return Message(msg, Ctrl(), Shift(), Alt(), key);
+				return Message(msg, key);
 			}
 
 			default:

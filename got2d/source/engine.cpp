@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "inner_utility.h"
 #include "scope_utility.h"
+#include "input.h"
 #include <algorithm>
 
 uint32_t G2DAPI NextClassID()
@@ -76,6 +77,9 @@ g2d::Scene* Engine::CreateNewScene(float boundSize)
 void Engine::Update(uint32_t deltaTime)
 {
 	m_elapsedTime += deltaTime;
+
+	Keyboard::Instance.Update(m_elapsedTime);
+
 	for (auto& scene : m_scenes)
 	{
 		scene->Update(m_elapsedTime, deltaTime);
@@ -84,10 +88,13 @@ void Engine::Update(uint32_t deltaTime)
 
 void Engine::OnMessage(const g2d::Message& message)
 {
+	Keyboard::Instance.OnMessage(message, m_elapsedTime);
+
 	for (auto& scene : m_scenes)
 	{
 		scene->OnMessage(message, m_elapsedTime);
 	}
+
 }
 
 bool Engine::CreateRenderSystem(void* nativeWindow)
