@@ -3,99 +3,188 @@
 #include <Windows.h>
 #include <Windowsx.h>
 
-struct msg_map
+struct Mapping
 {
-	msg_map()
+	Mapping()
 	{
-		reg(WM_LBUTTONDOWN, {
+		RegisterMessageMapping();
+		RegisterKeyCodeMapping();
+	}
+
+	bool ExistMessage(uint32_t win32msg) const
+	{
+		return m_msgMapping.count(win32msg) > 0;
+	}
+
+	const g2d::Message& ToMessage(uint32_t win32msg) const
+	{
+		return m_msgMapping.at(win32msg);
+	}
+
+	g2d::KeyCode ToKeyCode(uint32_t vkey) const
+	{
+		if (m_keyMapping.count(vkey) == 0)
+			return g2d::KeyCode::Invalid;
+		return m_keyMapping.at(vkey);
+	}
+private:
+	void RegisterMessageMapping()
+	{
+
+		RegisterMessage(WM_LBUTTONDOWN, {
 			g2d::MessageEvent::MouseButtonDown,
 			g2d::MouseButton::Left,
 		});
 
-		reg(WM_LBUTTONUP, {
+		RegisterMessage(WM_LBUTTONUP, {
 			g2d::MessageEvent::MouseButtonUp,
 			g2d::MouseButton::Left,
 		});
 
-		reg(WM_LBUTTONDBLCLK, {
+		RegisterMessage(WM_LBUTTONDBLCLK, {
 			g2d::MessageEvent::MouseButtonDoubleClick,
 			g2d::MouseButton::Left,
 		});
 
-		reg(WM_RBUTTONDOWN, {
+		RegisterMessage(WM_RBUTTONDOWN, {
 			g2d::MessageEvent::MouseButtonDown,
 			g2d::MouseButton::Right,
 		});
 
-		reg(WM_RBUTTONUP, {
+		RegisterMessage(WM_RBUTTONUP, {
 			g2d::MessageEvent::MouseButtonUp,
 			g2d::MouseButton::Right,
 		});
 
-		reg(WM_RBUTTONDBLCLK, {
+		RegisterMessage(WM_RBUTTONDBLCLK, {
 			g2d::MessageEvent::MouseButtonDoubleClick,
 			g2d::MouseButton::Right,
 
 		});
 
-		reg(WM_MBUTTONDOWN, {
+		RegisterMessage(WM_MBUTTONDOWN, {
 			g2d::MessageEvent::MouseButtonDown,
 			g2d::MouseButton::Middle,
 		});
 
-		reg(WM_MBUTTONUP, {
+		RegisterMessage(WM_MBUTTONUP, {
 			g2d::MessageEvent::MouseButtonUp,
 			g2d::MouseButton::Middle,
 		});
 
-		reg(WM_MBUTTONDBLCLK, {
-		g2d::MessageEvent::MouseButtonDoubleClick,
+		RegisterMessage(WM_MBUTTONDBLCLK, {
+			g2d::MessageEvent::MouseButtonDoubleClick,
 			g2d::MouseButton::Middle,
 		});
 
-		reg(WM_MOUSEMOVE, {
+		RegisterMessage(WM_MOUSEMOVE, {
 			g2d::MessageEvent::MouseMove,
 			g2d::MouseButton::None,
 		});
 
-		reg(WM_KEYDOWN, {
+		RegisterMessage(WM_KEYDOWN, {
 			g2d::MessageEvent::KeyDown,
 			g2d::MessageSource::Keyboard
 		});
 
-		reg(WM_KEYUP, {
+		RegisterMessage(WM_KEYUP, {
 			g2d::MessageEvent::KeyUp,
 			g2d::MessageSource::Keyboard
 		});
 	}
 
-	bool exist(uint32_t win32msg) const
+	void RegisterKeyCodeMapping()
 	{
-		return m_mapping.count(win32msg) > 0;
-	}
+		// Functions
+		RegisterKeyCode(VK_BACK, g2d::KeyCode::Backspace);
+		RegisterKeyCode(VK_CONTROL, g2d::KeyCode::Control);
+		RegisterKeyCode(VK_LCONTROL, g2d::KeyCode::Control);
+		RegisterKeyCode(VK_RCONTROL, g2d::KeyCode::Control);
+		RegisterKeyCode(VK_SHIFT, g2d::KeyCode::Shift);
+		RegisterKeyCode(VK_LSHIFT, g2d::KeyCode::Shift);
+		RegisterKeyCode(VK_RSHIFT, g2d::KeyCode::Shift);
+		RegisterKeyCode(VK_MENU, g2d::KeyCode::Alt);
+		RegisterKeyCode(VK_LMENU, g2d::KeyCode::Alt);
+		RegisterKeyCode(VK_RMENU, g2d::KeyCode::Alt);
+		RegisterKeyCode(VK_PAUSE, g2d::KeyCode::Pause);
+		RegisterKeyCode(VK_CAPITAL, g2d::KeyCode::Capital);
+		RegisterKeyCode(VK_ESCAPE, g2d::KeyCode::Escape);
 
-	const g2d::Message& get(uint32_t win32msg) const
-	{
-		return m_mapping.at(win32msg);
-	}
-private:
+		RegisterKeyCode(VK_PRIOR, g2d::KeyCode::PageUp);
+		RegisterKeyCode(VK_NEXT, g2d::KeyCode::PageDown);
+		RegisterKeyCode(VK_HOME, g2d::KeyCode::Home);
+		RegisterKeyCode(VK_END, g2d::KeyCode::End);
+		RegisterKeyCode(VK_INSERT, g2d::KeyCode::Insert);
+		RegisterKeyCode(VK_DELETE, g2d::KeyCode::Delete);
 
-	void reg(uint32_t win32msg, const g2d::Message& m)
-	{
-		m_mapping.insert({ win32msg, m });
+		RegisterKeyCode(VK_LEFT, g2d::KeyCode::ArrowLeft);
+		RegisterKeyCode(VK_UP, g2d::KeyCode::ArrowUp);
+		RegisterKeyCode(VK_RIGHT, g2d::KeyCode::ArrowRight);
+		RegisterKeyCode(VK_DOWN, g2d::KeyCode::ArrowDown);
+
+		RegisterKeyCode(VK_TAB, g2d::KeyCode::Tab);
+		RegisterKeyCode(VK_RETURN, g2d::KeyCode::Enter);
+		RegisterKeyCode(VK_SPACE, g2d::KeyCode::Space);
+
+		// main characters
+		for (uint32_t key = 'A'; key <= 'Z'; key++)
+			RegisterKeyCode(key, g2d::KeyCode(key));
+
+		// numbers and numpads
+		for (uint32_t key = '0'; key <= '9'; key++)
+		{
+			RegisterKeyCode(key, g2d::KeyCode(key));
+			RegisterKeyCode(key + g2d::NumpadOffset, g2d::KeyCode(key + g2d::NumpadOffset));
+		}
+		RegisterKeyCode(VK_NUMLOCK, g2d::KeyCode::NumpadLock);
+		RegisterKeyCode(VK_DECIMAL, g2d::KeyCode::NumpadDecimal);
+		RegisterKeyCode(VK_SEPARATOR, g2d::KeyCode::NumpadEnter);
+		RegisterKeyCode(VK_ADD, g2d::KeyCode::NumpadAdd);
+		RegisterKeyCode(VK_SUBTRACT, g2d::KeyCode::NumpadSub);
+		RegisterKeyCode(VK_MULTIPLY, g2d::KeyCode::NumpadMul);
+		RegisterKeyCode(VK_DIVIDE, g2d::KeyCode::NumpadDiv);
+
+		// Fs
+		for (uint32_t key = (int)g2d::KeyCode::F1; key <= (int)g2d::KeyCode::F12; key++)
+		{
+			RegisterKeyCode(VK_F1 + ((int)g2d::KeyCode::F1 - key), g2d::KeyCode(key));
+		}
+
+		// OEM
+		RegisterKeyCode(VK_OEM_3, g2d::KeyCode::OMETilde);
+		RegisterKeyCode(VK_OEM_MINUS, g2d::KeyCode::OEMSub);
+		RegisterKeyCode(VK_OEM_PLUS, g2d::KeyCode::OEMAdd);
+		RegisterKeyCode(VK_OEM_4, g2d::KeyCode::OEMLBracket);
+		RegisterKeyCode(VK_OEM_6, g2d::KeyCode::OEMRBracket);
+		RegisterKeyCode(VK_OEM_5, g2d::KeyCode::OEMRSlash);
+		RegisterKeyCode(VK_OEM_1, g2d::KeyCode::OEMColon);
+		RegisterKeyCode(VK_OEM_7, g2d::KeyCode::OEMQuote);
+		RegisterKeyCode(VK_OEM_COMMA, g2d::KeyCode::OEMComma);
+		RegisterKeyCode(VK_OEM_PERIOD, g2d::KeyCode::OEMPeriod);
+		RegisterKeyCode(VK_OEM_2, g2d::KeyCode::OEMSlash);
 	}
-	typedef std::map<uint32_t, g2d::Message> msg_map_;
-	msg_map_ m_mapping;
+	void RegisterMessage(uint32_t win32msg, const g2d::Message& m)
+	{
+		m_msgMapping.insert({ win32msg, m });
+	}
+	void RegisterKeyCode(uint32_t win32key, g2d::KeyCode key)
+	{
+		m_keyMapping.insert({ win32key, key });
+	}
+	typedef std::map<uint32_t, g2d::Message> MSGMap;
+	typedef std::map<uint32_t, g2d::KeyCode> KEYMap;
+	MSGMap m_msgMapping;
+	KEYMap m_keyMapping;
 };
 
 namespace g2d
 {
 	Message G2DAPI TranslateMessageFromWin32(uint32_t message, uint32_t wparam, uint32_t lparam)
 	{
-		static const msg_map mapping;
-		if (mapping.exist(message))
+		static const Mapping mapping;
+		if (mapping.ExistMessage(message))
 		{
-			auto& msg = mapping.get(message);
+			auto& msg = mapping.ToMessage(message);
 			switch (msg.Source)
 			{
 			case MessageSource::Mouse:
@@ -117,7 +206,7 @@ namespace g2d
 			case MessageSource::Keyboard:
 			{
 				int key = wparam;
-				return Message(msg, key);
+				return Message(msg, mapping.ToKeyCode(key));
 			}
 
 			default:

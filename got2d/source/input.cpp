@@ -80,8 +80,8 @@ void Keyboard::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 #include <windows.h>
 void Keyboard::Update(uint32_t currentTimeStamp)
 {
-	auto ALTKey = VK_MENU;
-	auto ALTDown = VirtualKeyDown(ALTKey);
+	auto ALTKey = g2d::KeyCode::Alt;
+	auto ALTDown = VirtualKeyDown(VK_MENU);
 	auto& ALTState = GetState(ALTKey);
 	if (ALTDown && !ALTState.IsPressing())
 	{

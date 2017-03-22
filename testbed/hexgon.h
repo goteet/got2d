@@ -140,7 +140,7 @@ public:
 
 	virtual void OnKeyPress(g2d::KeyCode key, g2d::Keyboard& keyboard) override
 	{
-		if (key == 'c' || key == 'C')
+		if ((int)key == 'C')
 		{
 			g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 			for (int i = 0; i < 7; i++)
