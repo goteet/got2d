@@ -193,17 +193,24 @@ void Mouse::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 	{
 		if (message.Event == g2d::MessageEvent::MouseMove)
 		{
+			m_cursorPosition.set(message.CursorPositionX, message.CursorPositionY);
 			this->OnPressingEnd.NotifyAll(g2d::MouseButton::None);
 		}
 		else
 		{
+			if (m_cursorPosition.x != message.CursorPositionX ||
+				m_cursorPosition.y != message.CursorPositionY)
+			{
+				m_cursorPosition.set(message.CursorPositionX, message.CursorPositionY);
+				this->OnPressingEnd.NotifyAll(g2d::MouseButton::None);
+			}
+
 			for (auto& button : m_buttons)
 			{
 				if (message.MouseButton == button.Button)
 					button.OnMessage(message, currentTimeStamp);
 			}
 		}
-		m_cursorPosition.set(message.CursorPositionX, message.CursorPositionY);
 	}
 	else if (message.Event == g2d::MessageEvent::LostFocus)
 	{

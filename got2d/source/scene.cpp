@@ -129,8 +129,6 @@ void Scene::Release()
 	delete this;
 }
 
-
-
 void Scene::UnRegisterKeyEventReceiver()
 {
 	GetKeyboard().OnPress -= m_keyPressReceiver;
