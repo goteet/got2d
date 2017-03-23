@@ -50,6 +50,16 @@ uint32_t Keyboard::GetRepeatingCount(g2d::KeyCode key) const
 	return GetState(key).RepeatingCount();
 }
 
+bool Keyboard::IsFree() const
+{
+	for (auto& key : m_states)
+	{
+		if (key.second->State() != g2d::SwitchState::Releasing)
+			return false;
+	}
+	return true;
+}
+
 void Keyboard::CreateKeyState(g2d::KeyCode key)
 {
 	m_states.insert({ key, new KeyState(key) });
@@ -194,7 +204,11 @@ void Mouse::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 		if (message.Event == g2d::MessageEvent::MouseMove)
 		{
 			m_cursorPosition.set(message.CursorPositionX, message.CursorPositionY);
-			this->OnPressingEnd.NotifyAll(g2d::MouseButton::None);
+			for (auto& button : m_buttons)
+			{
+				button.BeginDrag();
+			}
+			this->OnMoving.NotifyAll(g2d::MouseButton::None);
 		}
 		else
 		{
@@ -202,13 +216,19 @@ void Mouse::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 				m_cursorPosition.y != message.CursorPositionY)
 			{
 				m_cursorPosition.set(message.CursorPositionX, message.CursorPositionY);
-				this->OnPressingEnd.NotifyAll(g2d::MouseButton::None);
+				this->OnMoving.NotifyAll(g2d::MouseButton::None);
 			}
-
-			for (auto& button : m_buttons)
+			if (message.Event == g2d::MessageEvent::MouseButtonDoubleClick)
 			{
-				if (message.MouseButton == button.Button)
-					button.OnMessage(message, currentTimeStamp);
+				OnDoubleClick.NotifyAll(message.MouseButton);
+			}
+			else
+			{
+				for (auto& button : m_buttons)
+				{
+					if (message.MouseButton == button.Button)
+						button.OnMessage(message, currentTimeStamp);
+				}
 			}
 		}
 	}
@@ -259,6 +279,17 @@ uint32_t Mouse::GetRepeatingCount(g2d::MouseButton button) const
 		return GetButton(button).RepeatingCount();
 }
 
+bool Mouse::IsFree() const
+{
+	for (auto& button : m_buttons)
+	{
+		if (button.State() != g2d::SwitchState::Releasing)
+			return false;
+	}
+	return true;
+}
+
+
 const Mouse::ButtonState& Mouse::GetButton(g2d::MouseButton& button) const
 {
 	return m_buttons[(int)button];
@@ -269,6 +300,16 @@ Mouse::ButtonState& Mouse::GetButton(g2d::MouseButton& button)
 	return m_buttons[(int)button];
 }
 
+void Mouse::ButtonState::BeginDrag()
+{
+	if (state == g2d::SwitchState::JustPressed)
+	{
+		state = g2d::SwitchState::Pressing;
+		OnPressingBegin(*this);
+		repeatCount = 1;
+		repeated = true;
+	}
+}
 
 void Mouse::ButtonState::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 {

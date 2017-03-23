@@ -334,7 +334,7 @@ private:	//BaseNode
 private:
 	void ResortCameraOrder();
 
-	::SceneNode* FindInteractiveObject(const g2d::Message& message);
+	::SceneNode* FindInteractiveObject(const gml::coord& cursorPos);
 
 	void RegisterKeyEventReceiver();
 
@@ -360,6 +360,8 @@ private:
 
 	void OnMousePressingEnd(g2d::MouseButton button);
 
+	void OnMouseDoubleClick(g2d::MouseButton button);
+
 	void OnMouseMoving();
 
 	KeyEventReceiver m_keyPressReceiver;
@@ -372,6 +374,7 @@ private:
 	MouseEventReceiver m_mousePressingReceiver;
 	MouseEventReceiver m_mousePressingEndReceiver;
 	MouseEventReceiver m_mouseMovingReceiver;
+	MouseEventReceiver m_mouseDoubleClickReceiver;
 
 	SpatialGraph m_spatial;
 	std::vector<::Camera*> m_cameras;
@@ -380,26 +383,14 @@ private:
 
 	class MouseButtonState
 	{
+		::SceneNode* dragNode = nullptr;
 	public:
-		const g2d::MouseButton button;
-
-		MouseButtonState(g2d::MouseButton btn) : button(btn) { }
-		void Update(uint32_t currentStamp);
-		bool OnMessage(const g2d::Message& message, uint32_t currentStamp, ::SceneNode* hitNode);
-		void ForceRelease();
-		bool IsHovering() const { return !isPressing && !isDragging; }
-	private:
-		void OnDoubleClick(const g2d::Message& message);
-		void OnMouseDown(const g2d::Message& message, uint32_t currentStamp);
-		bool OnMouseUp(const g2d::Message& message);
-		bool OnMouseMove(const g2d::Message& message);
-
-		bool isDragging = false;
-		bool isPressing = false;
-		uint32_t pressTimeStamp;
-		gml::coord pressCursorPos;
-		::SceneNode* nodeDragging = nullptr;
-		::SceneNode* nodeHovering = nullptr;
+		const g2d::MouseButton Button;
+		MouseButtonState(int index) : Button((g2d::MouseButton)index) { }
+		void OnMoving(::SceneNode* hitNode);
+		void OnPressingBegin(::SceneNode* hitNode);
+		void OnPressing(::SceneNode* hitNode);
+		void OnPressingEnd(::SceneNode* hitNode);
 	} m_mouseButtonState[3];
 	::SceneNode* m_hoverNode = nullptr;
 	bool m_canTickHovering = false;

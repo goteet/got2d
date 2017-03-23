@@ -61,6 +61,8 @@ public:
 
 	virtual uint32_t GetRepeatingCount(g2d::KeyCode key) const override;
 
+	virtual bool IsFree() const override;
+
 public:
 	static Keyboard Instance;
 
@@ -122,13 +124,17 @@ public:	//g2d::Mouse
 
 	virtual g2d::SwitchState GetPressState(g2d::MouseButton button) const override;
 
-	uint32_t GetRepeatingCount(g2d::MouseButton button) const override;
+	virtual uint32_t GetRepeatingCount(g2d::MouseButton button) const override;
+
+	virtual bool IsFree() const override;
 
 	MouseEvent OnPress;
 	MouseEvent OnPressingBegin;
 	MouseEvent OnPressing;
 	MouseEvent OnPressingEnd;
 	MouseEvent OnMoving;
+	MouseEvent OnDoubleClick;
+
 private:
 	class ButtonState
 	{
@@ -148,6 +154,7 @@ private:
 
 		ButtonState(g2d::MouseButton btn) : Button(btn) { }
 		void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
+		void BeginDrag();
 		void Update(uint32_t currentTimeStamp);
 		void ForceRelease();
 		std::function<void(ButtonState&)> OnPress = nullptr;
