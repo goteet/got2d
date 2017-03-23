@@ -14,11 +14,22 @@ Scene::Scene(float boundSize)
 
 void Scene::RegisterKeyboardListener()
 {
-	m_pressReceiver.UserData = m_pressingReceiver.UserData = this;
+	m_pressReceiver.UserData
+		= m_pressingBeginReceiver.UserData
+		= m_pressingReceiver.UserData
+		= m_pressingEndReceiver.UserData
+		= this;
+
 	m_pressReceiver.Functor = [](void* userData, g2d::KeyCode key)
 	{
 		::Scene* scene = reinterpret_cast<::Scene*>(userData);
 		scene->OnKeyPress(key);
+	};
+
+	m_pressingBeginReceiver.Functor = [](void* userData, g2d::KeyCode key)
+	{
+		::Scene* scene = reinterpret_cast<::Scene*>(userData);
+		scene->OnKeyPressingBegin(key);
 	};
 
 	m_pressingReceiver.Functor = [](void* userData, g2d::KeyCode key)
@@ -27,8 +38,16 @@ void Scene::RegisterKeyboardListener()
 		scene->OnKeyPressing(key);
 	};
 
+	m_pressingEndReceiver.Functor = [](void* userData, g2d::KeyCode key)
+	{
+		::Scene* scene = reinterpret_cast<::Scene*>(userData);
+		scene->OnKeyPressingEnd(key);
+	};
+
 	GetKeyboard().OnPress += m_pressReceiver;
+	GetKeyboard().OnPressingBegin += m_pressingBeginReceiver;
 	GetKeyboard().OnPressing += m_pressingReceiver;
+	GetKeyboard().OnPressingEnd += m_pressingEndReceiver;
 }
 
 void Scene::ResortCameraOrder()
@@ -68,7 +87,9 @@ void Scene::Release()
 void Scene::UnRegisterKeyboardListener()
 {
 	GetKeyboard().OnPress -= m_pressReceiver;
+	GetKeyboard().OnPressingBegin -= m_pressingBeginReceiver;
 	GetKeyboard().OnPressing -= m_pressingReceiver;
+	GetKeyboard().OnPressingEnd -= m_pressingEndReceiver;
 }
 
 void Scene::Update(uint32_t elapsedTime, uint32_t deltaTime)
@@ -339,10 +360,24 @@ void Scene::OnKeyPress(g2d::KeyCode key)
 	});
 }
 
+void Scene::OnKeyPressingBegin(g2d::KeyCode key)
+{
+	TraversalChildren([&](::SceneNode* child) {
+		child->OnKeyPressingBegin(key);
+	});
+}
+
 void Scene::OnKeyPressing(g2d::KeyCode key)
 {
 	TraversalChildren([&](::SceneNode* child) {
 		child->OnKeyPressing(key);
+	});
+}
+
+void Scene::OnKeyPressingEnd(g2d::KeyCode key)
+{
+	TraversalChildren([&](::SceneNode* child) {
+		child->OnKeyPressingEnd(key);
 	});
 }
 

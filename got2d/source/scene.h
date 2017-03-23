@@ -145,9 +145,13 @@ public:
 
 	void OnDropTo(::SceneNode* dropped, g2d::MouseButton button, const gml::coord& cursorPos);
 
+	void OnKeyPress(g2d::KeyCode key);
+
+	void OnKeyPressingBegin(g2d::KeyCode key);
+
 	void OnKeyPressing(g2d::KeyCode key);
 
-	void OnKeyPress(g2d::KeyCode key);
+	void OnKeyPressingEnd(g2d::KeyCode key);
 
 public:	//g2d::SceneNode
 	virtual g2d::Scene* GetScene() const override;
@@ -338,10 +342,16 @@ private:
 
 	void OnKeyPress(g2d::KeyCode key);
 
+	void OnKeyPressingBegin(g2d::KeyCode key);
+
 	void OnKeyPressing(g2d::KeyCode key);
 
+	void OnKeyPressingEnd(g2d::KeyCode key);
+
 	KeyEventReceiver m_pressReceiver;
+	KeyEventReceiver m_pressingBeginReceiver;
 	KeyEventReceiver m_pressingReceiver;
+	KeyEventReceiver m_pressingEndReceiver;
 
 	SpatialGraph m_spatial;
 	std::vector<::Camera*> m_cameras;
@@ -371,6 +381,6 @@ private:
 		::SceneNode* nodeDragging = nullptr;
 		::SceneNode* nodeHovering = nullptr;
 	} m_mouseButtonState[3];
-	::SceneNode* m_hoverNode = nullptr;	
+	::SceneNode* m_hoverNode = nullptr;
 	bool m_canTickHovering = false;
 };

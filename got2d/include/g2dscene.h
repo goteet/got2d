@@ -97,11 +97,19 @@ namespace g2d
 		virtual void OnRDropTo(SceneNode* dropped, const gml::coord& cursorPos, const g2d::Keyboard&) { }
 		virtual void OnMDropTo(SceneNode* dropped, const gml::coord& cursorPos, const g2d::Keyboard&) { }
 
+		// 键位被触发，与持续按下的情况互斥
+		virtual void OnKeyPress(KeyCode key, const g2d::Keyboard& keyboard) { }
+
+		// 键位被持续按下的第一下
+		virtual void OnKeyPressingBegin(KeyCode key, const g2d::Keyboard& keyboard) { }
+
 		// 键位被持续按下
 		virtual void OnKeyPressing(KeyCode key, const g2d::Keyboard& keyboard) { }
 
-		// 键位被触发，与持续按下的情况互斥
-		virtual void OnKeyPress(KeyCode key, const g2d::Keyboard& keyboard) { }
+		// 键位被持续按下的最后一下
+		virtual void OnKeyPressingEnd(KeyCode key, const g2d::Keyboard& keyboard) { }
+
+		
 	};
 
 	// 实体基类，节点逻辑的实现全在entity内

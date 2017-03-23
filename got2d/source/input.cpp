@@ -52,11 +52,19 @@ g2d::SwitchState Keyboard::PressState(g2d::KeyCode key) const
 	return GetState(key).State();
 }
 
+uint32_t Keyboard::GetRepeatingCount(g2d::KeyCode key) const
+{
+	return GetState(key).RepeatingCount();
+}
+
 void Keyboard::CreateKeyState(g2d::KeyCode key)
 {
 	m_states.insert({ key, new KeyState(key) });
-	m_states[key]->OnPressing = [this](KeyState& state) { this->OnPressing.NotifyAll(state.Key); };
 	m_states[key]->OnPress = [this](KeyState& state) { this->OnPress.NotifyAll(state.Key); };
+	m_states[key]->OnPressingBegin = [this](KeyState& state) { this->OnPressingBegin.NotifyAll(state.Key); };
+	m_states[key]->OnPressing = [this](KeyState& state) { this->OnPressing.NotifyAll(state.Key); };
+	m_states[key]->OnPressingEnd = [this](KeyState& state) { this->OnPressingEnd.NotifyAll(state.Key); };
+
 }
 
 Keyboard::KeyState& Keyboard::GetState(g2d::KeyCode key) const
@@ -121,7 +129,12 @@ void Keyboard::KeyState::OnMessage(const g2d::Message& message, uint32_t current
 		{
 			OnPress(*this);
 		}
-		else if (state == g2d::SwitchState::Releasing)
+		else if (state == g2d::SwitchState::Pressing)
+		{
+			OnPressingEnd(*this);
+			repeatCount = 0;
+		}
+		else
 		{
 			//�쳣״̬
 		}
@@ -134,10 +147,13 @@ void Keyboard::KeyState::Update(uint32_t currentTimeStamp)
 	if (state == g2d::SwitchState::JustPressed && (currentTimeStamp - pressTimeStamp) > PRESSING_INTERVAL)
 	{
 		state = g2d::SwitchState::Pressing;
+		OnPressingBegin(*this);
+		repeatCount = 1;
 	}
 	if (state == g2d::SwitchState::Pressing)
 	{
 		OnPressing(*this);
+		repeatCount++;
 	}
 }
 
@@ -146,6 +162,11 @@ inline void Keyboard::KeyState::ForceRelease()
 	if (state == g2d::SwitchState::JustPressed)
 	{
 		OnPress(*this);
+	}
+	else if (state == g2d::SwitchState::Pressing)
+	{
+		OnPressingEnd(*this);
+		repeatCount = 0;
 	}
 	state = g2d::SwitchState::Releasing;
 }

@@ -16,6 +16,8 @@ namespace g2d
 		// 键盘按键是否被按下
 		virtual SwitchState PressState(KeyCode key) const = 0;
 
+		virtual uint32_t GetRepeatingCount(KeyCode key) const = 0;
+
 		bool IsReleasing(KeyCode key) { return PressState(key) == SwitchState::Releasing; }
 
 		bool IsPressing(KeyCode key) { return PressState(key) == SwitchState::Pressing; }

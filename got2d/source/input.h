@@ -30,6 +30,8 @@ class Keyboard : public g2d::Keyboard
 public:
 	virtual g2d::SwitchState PressState(g2d::KeyCode key) const override;
 
+	virtual uint32_t GetRepeatingCount(g2d::KeyCode key) const override;
+
 public:
 	static Keyboard Instance;
 
@@ -39,12 +41,15 @@ public:
 
 	void Update(uint32_t currentTimeStamp);
 
-	KeyEventDelegate OnPressing;
 	KeyEventDelegate OnPress;
+	KeyEventDelegate OnPressingBegin;
+	KeyEventDelegate OnPressing;
+	KeyEventDelegate OnPressingEnd;
 
 private:
 	class KeyState
 	{
+		uint32_t repeatCount = 0;
 		uint32_t pressTimeStamp;
 		g2d::SwitchState state = g2d::SwitchState::Releasing;
 	public:
@@ -52,12 +57,17 @@ private:
 
 		g2d::SwitchState State() const { return state; }
 
+		uint32_t RepeatingCount() const { return repeatCount; }
+
 		KeyState(g2d::KeyCode key) : Key(key) { }
 		void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
 		void Update(uint32_t currentTimeStamp);
 		void ForceRelease();
-		std::function<void(KeyState&)> OnPressing = nullptr;
 		std::function<void(KeyState&)> OnPress = nullptr;
+		std::function<void(KeyState&)> OnPressingBegin = nullptr;
+		std::function<void(KeyState&)> OnPressing = nullptr;
+		std::function<void(KeyState&)> OnPressingEnd = nullptr;
+
 	};
 	KeyState& GetState(g2d::KeyCode key) const;
 	void CreateKeyState(g2d::KeyCode key);

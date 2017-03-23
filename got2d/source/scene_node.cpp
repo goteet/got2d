@@ -523,12 +523,22 @@ void SceneNode::OnDropTo(::SceneNode* dropped, g2d::MouseButton button, const gm
 	}
 }
 
+void SceneNode::OnKeyPress(g2d::KeyCode key)
+{
+	m_entity->OnKeyPress(key, GetKeyboard());
+}
+
+void SceneNode::OnKeyPressingBegin(g2d::KeyCode key)
+{
+	m_entity->OnKeyPressingBegin(key, GetKeyboard());
+}
+
 void SceneNode::OnKeyPressing(g2d::KeyCode key)
 {
 	m_entity->OnKeyPressing(key, GetKeyboard());
 }
 
-void SceneNode::OnKeyPress(g2d::KeyCode key)
+void SceneNode::OnKeyPressingEnd(g2d::KeyCode key)
 {
-	m_entity->OnKeyPress(key, GetKeyboard());
+	m_entity->OnKeyPressing(key, GetKeyboard());
 }
