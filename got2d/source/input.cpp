@@ -47,7 +47,7 @@ Keyboard::~Keyboard()
 	m_states.clear();
 }
 
-g2d::SwitchState Keyboard::PressState(g2d::KeyCode key) const
+g2d::SwitchState Keyboard::GetPressState(g2d::KeyCode key) const
 {
 	return GetState(key).State();
 }
@@ -177,7 +177,7 @@ bool Keyboard::VirtualKeyDown(uint32_t virtualKey)
 }
 
 Mouse::Mouse()
-	: m_buttons{ g2d::MouseButton::Left, g2d::MouseButton::Right, g2d::MouseButton::Middle }
+	: m_buttons{ g2d::MouseButton::Left, g2d::MouseButton::Middle, g2d::MouseButton::Right, }
 {
 
 }
@@ -209,15 +209,46 @@ void Mouse::Update(uint32_t currentTimeStamp)
 	}
 }
 
-g2d::SwitchState Mouse::PressState(g2d::MouseButton button) const
-{
-	return g2d::SwitchState::Releasing;
-}
-
-const gml::coord& Mouse::CursorPosition() const
+const gml::coord& Mouse::GetCursorPosition() const
 {
 	return m_cursorPosition;
 }
+
+const gml::coord& Mouse::GetCursorPressPosition(g2d::MouseButton button) const
+{
+	if (button == g2d::MouseButton::None)
+		return GetCursorPosition();
+	else
+		return GetButton(button).CursorPressPos();
+}
+
+
+g2d::SwitchState Mouse::GetPressState(g2d::MouseButton button) const
+{
+	if (button == g2d::MouseButton::None)
+		return g2d::SwitchState::Releasing;
+	else
+		return GetButton(button).State();
+}
+
+uint32_t Mouse::GetRepeatingCount(g2d::MouseButton button) const
+{
+	if (button == g2d::MouseButton::None)
+		return 0;
+	else
+		return GetButton(button).RepeatingCount();
+}
+
+const Mouse::ButtonState& Mouse::GetButton(g2d::MouseButton& button) const
+{
+	return m_buttons[(int)button];
+}
+
+Mouse::ButtonState& Mouse::GetButton(g2d::MouseButton& button)
+{
+	return m_buttons[(int)button];
+}
+
 
 void Mouse::ButtonState::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 {

@@ -14,15 +14,16 @@ namespace g2d
 	{
 	public:
 		// 键盘按键是否被按下
-		virtual SwitchState PressState(KeyCode key) const = 0;
+		virtual SwitchState GetPressState(KeyCode key) const = 0;
 
+		// 某个按键的重复次数
 		virtual uint32_t GetRepeatingCount(KeyCode key) const = 0;
 
-		bool IsReleasing(KeyCode key) { return PressState(key) == SwitchState::Releasing; }
+		bool IsReleasing(KeyCode key) { return GetPressState(key) == SwitchState::Releasing; }
 
-		bool IsPressing(KeyCode key) { return PressState(key) == SwitchState::Pressing; }
+		bool IsPressing(KeyCode key) { return GetPressState(key) == SwitchState::Pressing; }
 
-		bool IsJustPressed(KeyCode key) { return PressState(key) == SwitchState::JustPressed; }
+		bool IsJustPressed(KeyCode key) { return GetPressState(key) == SwitchState::JustPressed; }
 	};
 
 	// 鼠标状态获取接口
@@ -30,15 +31,21 @@ namespace g2d
 	{
 	public:
 		// 光标的屏幕坐标
-		virtual const gml::coord& CursorPosition() const = 0;
+		virtual const gml::coord& GetCursorPosition() const = 0;
+
+		// 按下鼠标按键的时候，光标的屏幕坐标
+		virtual const gml::coord& GetCursorPressPosition(MouseButton button) const = 0;
 
 		// 按键是否被按下
-		virtual SwitchState PressState(MouseButton button) const = 0;
+		virtual SwitchState GetPressState(MouseButton button) const = 0;
 
-		bool IsReleasing(MouseButton button) { return PressState(button) == SwitchState::Releasing; }
+		// 按键的持续重复次数
+		virtual uint32_t GetRepeatingCount(MouseButton button) const = 0;
 
-		bool IsPressing(MouseButton button) { return PressState(button) == SwitchState::Pressing; }
+		bool IsReleasing(MouseButton button) { return GetPressState(button) == SwitchState::Releasing; }
 
-		bool IsJustPressed(MouseButton button) { return PressState(button) == SwitchState::JustPressed; }
+		bool IsPressing(MouseButton button) { return GetPressState(button) == SwitchState::Pressing; }
+
+		bool IsJustPressed(MouseButton button) { return GetPressState(button) == SwitchState::JustPressed; }
 	};
 }

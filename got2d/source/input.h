@@ -28,7 +28,7 @@ private:
 class Keyboard : public g2d::Keyboard
 {
 public:
-	virtual g2d::SwitchState PressState(g2d::KeyCode key) const override;
+	virtual g2d::SwitchState GetPressState(g2d::KeyCode key) const override;
 
 	virtual uint32_t GetRepeatingCount(g2d::KeyCode key) const override;
 
@@ -87,27 +87,39 @@ public:
 	void Update(uint32_t currentTimeStamp);
 
 public:	//g2d::Mouse
-	virtual g2d::SwitchState PressState(g2d::MouseButton button) const override;
+	virtual const gml::coord& GetCursorPosition() const override; 
 
-	virtual const gml::coord& CursorPosition() const override;
+	virtual const gml::coord& GetCursorPressPosition(g2d::MouseButton button) const override;
+
+	virtual g2d::SwitchState GetPressState(g2d::MouseButton button) const override;
+
+	uint32_t GetRepeatingCount(g2d::MouseButton button) const override;
 
 private:
 	class ButtonState
 	{
+		uint32_t repeatCount = 0;
 		uint32_t pressTimeStamp;
-		gml::coord pressPos;
+		gml::coord pressCursorPos;
 		g2d::SwitchState state = g2d::SwitchState::Releasing;
 	public:
 		const g2d::MouseButton Button;
 
 		g2d::SwitchState State() const { return state; }
 
-		const gml::coord& PressPos() const { return pressPos; }
+		const gml::coord& CursorPressPos() const { return pressCursorPos; }
+
+		uint32_t RepeatingCount() const { return repeatCount; }
 
 		ButtonState(g2d::MouseButton btn) : Button(btn) { }
 		void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
 		void Update(uint32_t currentTimeStamp);
 	} m_buttons[3];
+
+	ButtonState& GetButton(g2d::MouseButton& button);
+
+	const ButtonState& GetButton(g2d::MouseButton& button) const;
+
 	gml::coord m_cursorPosition;
 };
 

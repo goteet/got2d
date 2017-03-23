@@ -130,7 +130,7 @@ void Scene::MouseButtonState::Update(uint32_t currentStamp)
 		isDragging = true;
 		// 使用上一个消息的按键
 		nodeDragging = nodeHovering;
-		nodeDragging->OnDragBegin(button, pressCursorPos);
+		nodeDragging->OnDragBegin(button);
 	}
 }
 
@@ -140,11 +140,11 @@ void Scene::MouseButtonState::ForceRelease()
 	{
 		if (nodeDragging == nodeHovering)
 		{
-			nodeDragging->OnDragEnd(button, pressCursorPos);
+			nodeDragging->OnDragEnd(button);
 		}
 		else
 		{
-			nodeDragging->OnDropTo(nodeHovering, button, pressCursorPos);
+			nodeDragging->OnDropTo(nodeHovering, button);
 		}
 
 		isDragging = false;
@@ -153,7 +153,7 @@ void Scene::MouseButtonState::ForceRelease()
 	}
 	else if (isPressing)
 	{
-		nodeHovering->OnClick(button, pressCursorPos);
+		nodeHovering->OnClick(button);
 		isPressing = false;
 	}
 }
@@ -162,8 +162,7 @@ void Scene::MouseButtonState::OnDoubleClick(const g2d::Message& message)
 {
 	if (nodeHovering != nullptr)
 	{
-		nodeHovering->OnDoubleClick(message.MouseButton,
-			gml::coord(message.CursorPositionX, message.CursorPositionY));
+		nodeHovering->OnDoubleClick(message.MouseButton);
 	}
 }
 
@@ -187,19 +186,15 @@ bool Scene::MouseButtonState::OnMouseUp(const g2d::Message& message)
 	{
 		if (nodeHovering != nullptr && nodeHovering != nodeDragging)
 		{
-			nodeDragging->OnDropTo(nodeHovering, button,
-				gml::coord(message.CursorPositionX, message.CursorPositionY));
+			nodeDragging->OnDropTo(nodeHovering, button);
 
-			nodeHovering->OnCursorEnterFrom(nodeDragging,
-				gml::coord(message.CursorPositionX, message.CursorPositionY));
+			nodeHovering->OnCursorEnterFrom(nodeDragging);
 		}
 		else
 		{
-			nodeDragging->OnDragEnd(button,
-				gml::coord(message.CursorPositionX, message.CursorPositionY));
+			nodeDragging->OnDragEnd(button);
 
-			nodeDragging->OnCursorEnterFrom(nodeDragging,
-				gml::coord(message.CursorPositionX, message.CursorPositionY));
+			nodeDragging->OnCursorEnterFrom(nodeDragging);
 		}
 		isPressing = false;
 		isDragging = false;
@@ -208,8 +203,7 @@ bool Scene::MouseButtonState::OnMouseUp(const g2d::Message& message)
 	}
 	else if (isPressing)
 	{
-		nodeHovering->OnClick(button,
-			gml::coord(message.CursorPositionX, message.CursorPositionY));
+		nodeHovering->OnClick(button);
 		isPressing = false;
 		return true;
 	}
@@ -226,11 +220,9 @@ bool Scene::MouseButtonState::OnMouseMove(const g2d::Message& message)
 		{
 			isDragging = true;
 			nodeDragging = nodeHovering;
-			nodeDragging->OnDragBegin(button,
-				gml::coord(message.CursorPositionX, message.CursorPositionY));
+			nodeDragging->OnDragBegin(button);
 
-			nodeDragging->OnDragging(button,
-				gml::coord(message.CursorPositionX, message.CursorPositionY));
+			nodeDragging->OnDragging(button);
 			return true;
 		}
 		else
@@ -243,13 +235,11 @@ bool Scene::MouseButtonState::OnMouseMove(const g2d::Message& message)
 	{
 		if (nodeHovering != nullptr && nodeHovering != nodeDragging)
 		{
-			nodeDragging->OnDropping(nodeHovering, button,
-				gml::coord(message.CursorPositionX, message.CursorPositionY));
+			nodeDragging->OnDropping(nodeHovering, button);
 		}
 		else
 		{
-			nodeDragging->OnDragging(button,
-				gml::coord(message.CursorPositionX, message.CursorPositionY));
+			nodeDragging->OnDragging(button);
 		}
 		return true;
 	}
@@ -272,8 +262,7 @@ bool Scene::MouseButtonState::OnMessage(const g2d::Message& message, uint32_t cu
 			if (isDragging)//异常状态
 			{
 				// 让上次的dragging事件正常结束
-				nodeDragging->OnDragEnd(button,
-					gml::coord(message.CursorPositionX, message.CursorPositionY));
+				nodeDragging->OnDragEnd(button);
 
 				isDragging = false;
 				isPressing = false;
@@ -331,13 +320,11 @@ void Scene::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 			{
 				if (m_hoverNode != nullptr)
 				{
-					m_hoverNode->OnCursorLeaveTo(hitNode,
-						gml::coord(message.CursorPositionX, message.CursorPositionY));
+					m_hoverNode->OnCursorLeaveTo(hitNode);
 				}
 				if (hitNode != nullptr)
 				{
-					hitNode->OnCursorEnterFrom(m_hoverNode,
-						gml::coord(message.CursorPositionX, message.CursorPositionY));
+					hitNode->OnCursorEnterFrom(m_hoverNode);
 				}
 				m_hoverNode = hitNode;
 			}

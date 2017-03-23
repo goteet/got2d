@@ -24,7 +24,7 @@ namespace g2d
 	// 鼠标按键标识
 	enum class G2DAPI MouseButton : int
 	{
-		Left, Middle, Right, None
+		Left = 0, Middle = 1, Right = 2, None = 3
 	};
 
 	constexpr int NUMPAD_OFFSET = 0x1000;

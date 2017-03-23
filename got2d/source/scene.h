@@ -125,25 +125,25 @@ public:
 
 	void OnMessage(const g2d::Message& message);
 
-	void OnCursorEnterFrom(::SceneNode* adjacency, const gml::coord& cursorPos);
+	void OnCursorEnterFrom(::SceneNode* adjacency);
 
 	void OnCursorHovering();
 
-	void OnCursorLeaveTo(::SceneNode* adjacency, const gml::coord& cursorPos);
+	void OnCursorLeaveTo(::SceneNode* adjacency);
 
-	void OnClick(g2d::MouseButton button, const gml::coord& cursorPos);
+	void OnClick(g2d::MouseButton button);
 
-	void OnDoubleClick(g2d::MouseButton button, const gml::coord& cursorPos);
+	void OnDoubleClick(g2d::MouseButton button);
 
-	void OnDragBegin(g2d::MouseButton button, const gml::coord& cursorPos);
+	void OnDragBegin(g2d::MouseButton button);
 
-	void OnDragging(g2d::MouseButton button, const gml::coord& cursorPos);
+	void OnDragging(g2d::MouseButton button);
 
-	void OnDragEnd(g2d::MouseButton button, const gml::coord& cursorPos);
+	void OnDragEnd(g2d::MouseButton button);
 
-	void OnDropping(::SceneNode* dropped, g2d::MouseButton button, const gml::coord& cursorPos);
+	void OnDropping(::SceneNode* dropped, g2d::MouseButton button);
 
-	void OnDropTo(::SceneNode* dropped, g2d::MouseButton button, const gml::coord& cursorPos);
+	void OnDropTo(::SceneNode* dropped, g2d::MouseButton button);
 
 	void OnKeyPress(g2d::KeyCode key);
 
