@@ -11,32 +11,25 @@ bool KeyEventReceiver::operator==(const KeyEventReceiver& other) const
 	return (UserData == other.UserData && Functor == other.Functor);
 }
 
-void KeyEventDelegate::operator+=(const KeyEventReceiver& receiver)
+bool MouseEventReceiver::operator==(const MouseEventReceiver& other) const
 {
-	auto itFind = std::find(std::begin(m_receivers), std::end(m_receivers), receiver);
-
-	if (itFind == std::end(m_receivers))
-	{
-		m_receivers.push_back(receiver);
-	}
+	return (UserData == other.UserData && Functor == other.Functor);
 }
 
-void KeyEventDelegate::operator-=(const KeyEventReceiver& receiver)
+void KeyEvent::NotifyAll(g2d::KeyCode key)
 {
-	auto itFind = std::find(std::begin(m_receivers), std::end(m_receivers), receiver);
-	if (itFind != std::end(m_receivers))
-	{
-		m_receivers.erase(itFind);
-	}
+	Traversal([&](const KeyEventReceiver&receiver) {
+		receiver.Functor(receiver.UserData, key);
+	});
 }
 
-void KeyEventDelegate::NotifyAll(g2d::KeyCode key) const
+void MouseEvent::NotifyAll(g2d::MouseButton button)
 {
-	for (auto& listener : m_receivers)
-	{
-		listener.Functor(listener.UserData, key);
-	}
+	Traversal([&](const MouseEventReceiver&receiver) {
+		receiver.Functor(receiver.UserData, button);
+	});
 }
+
 
 Keyboard::~Keyboard()
 {
@@ -115,9 +108,15 @@ void Keyboard::KeyState::OnMessage(const g2d::Message& message, uint32_t current
 {
 	if (message.Event == g2d::MessageEvent::KeyDown)
 	{
-		if (state != g2d::SwitchState::Releasing)
+		if (state == g2d::SwitchState::JustPressed)
 		{
 			//�쳣״̬
+		}
+		else if (state == g2d::SwitchState::Pressing)
+		{
+			//�쳣״̬
+			OnPressingEnd(*this);
+			repeatCount = 0;
 		}
 
 		state = g2d::SwitchState::JustPressed;
@@ -179,16 +178,30 @@ bool Keyboard::VirtualKeyDown(uint32_t virtualKey)
 Mouse::Mouse()
 	: m_buttons{ g2d::MouseButton::Left, g2d::MouseButton::Middle, g2d::MouseButton::Right, }
 {
-
+	for (auto& button : m_buttons)
+	{
+		button.OnPress = [this](ButtonState& state) { this->OnPress.NotifyAll(state.Button); };
+		button.OnPressingBegin = [this](ButtonState& state) { this->OnPressingBegin.NotifyAll(state.Button); };
+		button.OnPressing = [this](ButtonState& state) { this->OnPressing.NotifyAll(state.Button); };
+		button.OnPressingEnd = [this](ButtonState& state) { this->OnPressingEnd.NotifyAll(state.Button); };
+	}
 }
 
 void Mouse::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 {
 	if (message.Source == g2d::MessageSource::Mouse)
 	{
-		for (auto& button : m_buttons)
+		if (message.Event == g2d::MessageEvent::MouseMove)
 		{
-			button.OnMessage(message, currentTimeStamp);
+			this->OnPressingEnd.NotifyAll(g2d::MouseButton::None);
+		}
+		else
+		{
+			for (auto& button : m_buttons)
+			{
+				if (message.MouseButton == button.Button)
+					button.OnMessage(message, currentTimeStamp);
+			}
 		}
 		m_cursorPosition.set(message.CursorPositionX, message.CursorPositionY);
 	}
@@ -196,7 +209,7 @@ void Mouse::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 	{
 		for (auto& button : m_buttons)
 		{
-			//button.ForceRelease();
+			button.ForceRelease();
 		}
 	}
 }
@@ -252,10 +265,71 @@ Mouse::ButtonState& Mouse::GetButton(g2d::MouseButton& button)
 
 void Mouse::ButtonState::OnMessage(const g2d::Message& message, uint32_t currentTimeStamp)
 {
+	if (message.Event == g2d::MessageEvent::MouseButtonDown)
+	{
+		if (state != g2d::SwitchState::JustPressed)
+		{
+			//�쳣״̬
+		}
+		else if (state != g2d::SwitchState::Pressing)
+		{
+			//�쳣״̬
+			OnPressingEnd(*this);
+			repeated = true;
+			repeatCount = 0;
+		}
 
+		state = g2d::SwitchState::JustPressed;
+		pressTimeStamp = currentTimeStamp;
+	}
+	else if (message.Event == g2d::MessageEvent::MouseButtonUp)
+	{
+		if (state == g2d::SwitchState::JustPressed)
+		{
+			OnPress(*this);
+		}
+		else if (state == g2d::SwitchState::Pressing)
+		{
+			OnPressingEnd(*this);
+			repeated = true;
+			repeatCount = 0;
+		}
+		else
+		{
+			//�쳣״̬
+		}
+		state = g2d::SwitchState::Releasing;
+	}
 }
 
 void Mouse::ButtonState::Update(uint32_t currentTimeStamp)
 {
+	if (state == g2d::SwitchState::JustPressed && (currentTimeStamp - pressTimeStamp) > PRESSING_INTERVAL)
+	{
+		state = g2d::SwitchState::Pressing;
+		OnPressingBegin(*this);
+		repeatCount = 1;
+		repeated = true;
+	}
+	if (state == g2d::SwitchState::Pressing && !repeated)
+	{
+		OnPressing(*this);
+		repeatCount++;
+		repeated = true;
+	}
+	repeated = false;
+}
 
+void Mouse::ButtonState::ForceRelease()
+{
+	if (state == g2d::SwitchState::JustPressed)
+	{
+		OnPress(*this);
+	}
+	else if (state == g2d::SwitchState::Pressing)
+	{
+		OnPressingEnd(*this);
+		repeatCount = 0;
+	}
+	state = g2d::SwitchState::Releasing;
 }

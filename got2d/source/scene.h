@@ -336,9 +336,13 @@ private:
 
 	::SceneNode* FindInteractiveObject(const g2d::Message& message);
 
-	void RegisterKeyboardListener();
+	void RegisterKeyEventReceiver();
 
-	void UnRegisterKeyboardListener();
+	void UnRegisterKeyEventReceiver();
+
+	void RegisterMouseEventReceiver();
+
+	void UnRegisterMouseEventReceiver();
 
 	void OnKeyPress(g2d::KeyCode key);
 
@@ -348,10 +352,26 @@ private:
 
 	void OnKeyPressingEnd(g2d::KeyCode key);
 
-	KeyEventReceiver m_pressReceiver;
-	KeyEventReceiver m_pressingBeginReceiver;
-	KeyEventReceiver m_pressingReceiver;
-	KeyEventReceiver m_pressingEndReceiver;
+	void OnMousePress(g2d::MouseButton button);
+
+	void OnMousePressingBegin(g2d::MouseButton button);
+
+	void OnMousePressing(g2d::MouseButton button);
+
+	void OnMousePressingEnd(g2d::MouseButton button);
+
+	void OnMouseMoving();
+
+	KeyEventReceiver m_keyPressReceiver;
+	KeyEventReceiver m_keyPressingBeginReceiver;
+	KeyEventReceiver m_keyPressingReceiver;
+	KeyEventReceiver m_keyPressingEndReceiver;
+
+	MouseEventReceiver m_mousePressReceiver;
+	MouseEventReceiver m_mousePressingBeginReceiver;
+	MouseEventReceiver m_mousePressingReceiver;
+	MouseEventReceiver m_mousePressingEndReceiver;
+	MouseEventReceiver m_mouseMovingReceiver;
 
 	SpatialGraph m_spatial;
 	std::vector<::Camera*> m_cameras;

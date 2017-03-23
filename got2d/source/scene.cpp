@@ -9,45 +9,91 @@ Scene::Scene(float boundSize)
 	, m_mouseButtonState{ g2d::MouseButton::Left, g2d::MouseButton::Right, g2d::MouseButton::Middle }
 {
 	CreateCameraNode();
-	RegisterKeyboardListener();
+	RegisterKeyEventReceiver();
+	RegisterMouseEventReceiver();
 }
 
-void Scene::RegisterKeyboardListener()
+void Scene::RegisterKeyEventReceiver()
 {
-	m_pressReceiver.UserData
-		= m_pressingBeginReceiver.UserData
-		= m_pressingReceiver.UserData
-		= m_pressingEndReceiver.UserData
+	m_keyPressReceiver.UserData
+		= m_keyPressingBeginReceiver.UserData
+		= m_keyPressingReceiver.UserData
+		= m_keyPressingEndReceiver.UserData
 		= this;
 
-	m_pressReceiver.Functor = [](void* userData, g2d::KeyCode key)
+	m_keyPressReceiver.Functor = [](void* userData, g2d::KeyCode key)
 	{
 		::Scene* scene = reinterpret_cast<::Scene*>(userData);
 		scene->OnKeyPress(key);
 	};
 
-	m_pressingBeginReceiver.Functor = [](void* userData, g2d::KeyCode key)
+	m_keyPressingBeginReceiver.Functor = [](void* userData, g2d::KeyCode key)
 	{
 		::Scene* scene = reinterpret_cast<::Scene*>(userData);
 		scene->OnKeyPressingBegin(key);
 	};
 
-	m_pressingReceiver.Functor = [](void* userData, g2d::KeyCode key)
+	m_keyPressingReceiver.Functor = [](void* userData, g2d::KeyCode key)
 	{
 		::Scene* scene = reinterpret_cast<::Scene*>(userData);
 		scene->OnKeyPressing(key);
 	};
 
-	m_pressingEndReceiver.Functor = [](void* userData, g2d::KeyCode key)
+	m_keyPressingEndReceiver.Functor = [](void* userData, g2d::KeyCode key)
 	{
 		::Scene* scene = reinterpret_cast<::Scene*>(userData);
 		scene->OnKeyPressingEnd(key);
 	};
 
-	GetKeyboard().OnPress += m_pressReceiver;
-	GetKeyboard().OnPressingBegin += m_pressingBeginReceiver;
-	GetKeyboard().OnPressing += m_pressingReceiver;
-	GetKeyboard().OnPressingEnd += m_pressingEndReceiver;
+	GetKeyboard().OnPress += m_keyPressReceiver;
+	GetKeyboard().OnPressingBegin += m_keyPressingBeginReceiver;
+	GetKeyboard().OnPressing += m_keyPressingReceiver;
+	GetKeyboard().OnPressingEnd += m_keyPressingEndReceiver;
+}
+
+void Scene::RegisterMouseEventReceiver()
+{
+	m_mousePressReceiver.UserData
+		= m_mousePressingBeginReceiver.UserData
+		= m_mousePressingReceiver.UserData
+		= m_mousePressingEndReceiver.UserData
+		= this;
+
+	m_mousePressReceiver.Functor = [](void* userData, g2d::MouseButton button)
+	{
+		::Scene* scene = reinterpret_cast<::Scene*>(userData);
+		scene->OnMousePress(button);
+	};
+
+	m_mousePressingBeginReceiver.Functor = [](void* userData, g2d::MouseButton button)
+	{
+		::Scene* scene = reinterpret_cast<::Scene*>(userData);
+		scene->OnMousePressingBegin(button);
+	};
+
+	m_mousePressingReceiver.Functor = [](void* userData, g2d::MouseButton button)
+	{
+		::Scene* scene = reinterpret_cast<::Scene*>(userData);
+		scene->OnMousePressing(button);
+	};
+
+	m_mousePressingEndReceiver.Functor = [](void* userData, g2d::MouseButton button)
+	{
+		::Scene* scene = reinterpret_cast<::Scene*>(userData);
+		scene->OnMousePressingEnd(button);
+	};
+
+	m_mouseMovingReceiver.Functor = [](void* userData, g2d::MouseButton button)
+	{
+		::Scene* scene = reinterpret_cast<::Scene*>(userData);
+		scene->OnMouseMoving();
+	};
+
+	GetMouse().OnPress += m_mousePressReceiver;
+	GetMouse().OnPressingBegin += m_mousePressingBeginReceiver;
+	GetMouse().OnPressing += m_mousePressingReceiver;
+	GetMouse().OnPressingEnd += m_mousePressingEndReceiver;
+	GetMouse().OnMoving += m_mouseMovingReceiver;
 }
 
 void Scene::ResortCameraOrder()
@@ -76,7 +122,8 @@ void Scene::ResortCameraOrder()
 
 void Scene::Release()
 {
-	UnRegisterKeyboardListener();
+	UnRegisterKeyEventReceiver();
+	UnRegisterMouseEventReceiver();
 	::GetEngineImpl()->RemoveScene(*this);
 	EmptyChildren();
 	delete this;
@@ -84,12 +131,21 @@ void Scene::Release()
 
 
 
-void Scene::UnRegisterKeyboardListener()
+void Scene::UnRegisterKeyEventReceiver()
 {
-	GetKeyboard().OnPress -= m_pressReceiver;
-	GetKeyboard().OnPressingBegin -= m_pressingBeginReceiver;
-	GetKeyboard().OnPressing -= m_pressingReceiver;
-	GetKeyboard().OnPressingEnd -= m_pressingEndReceiver;
+	GetKeyboard().OnPress -= m_keyPressReceiver;
+	GetKeyboard().OnPressingBegin -= m_keyPressingBeginReceiver;
+	GetKeyboard().OnPressing -= m_keyPressingReceiver;
+	GetKeyboard().OnPressingEnd -= m_keyPressingEndReceiver;
+}
+
+void Scene::UnRegisterMouseEventReceiver()
+{
+	GetMouse().OnPress -= m_mousePressReceiver;
+	GetMouse().OnPressingBegin -= m_mousePressingBeginReceiver;
+	GetMouse().OnPressing -= m_mousePressingReceiver;
+	GetMouse().OnPressingEnd -= m_mousePressingEndReceiver;
+	GetMouse().OnMoving -= m_mouseMovingReceiver;
 }
 
 void Scene::Update(uint32_t elapsedTime, uint32_t deltaTime)
@@ -366,6 +422,26 @@ void Scene::OnKeyPressingEnd(g2d::KeyCode key)
 	TraversalChildren([&](::SceneNode* child) {
 		child->OnKeyPressingEnd(key);
 	});
+}
+
+void Scene::OnMousePress(g2d::MouseButton button)
+{
+}
+
+void Scene::OnMousePressingBegin(g2d::MouseButton button)
+{
+}
+
+void Scene::OnMousePressing(g2d::MouseButton button)
+{
+}
+
+void Scene::OnMousePressingEnd(g2d::MouseButton button)
+{
+}
+
+void Scene::OnMouseMoving()
+{
 }
 
 ::SceneNode* Scene::FindInteractiveObject(const g2d::Message& message)

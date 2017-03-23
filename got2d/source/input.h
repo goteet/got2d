@@ -15,14 +15,43 @@ struct KeyEventReceiver
 	bool operator==(const KeyEventReceiver& other) const;
 };
 
-class KeyEventDelegate
+struct MouseEventReceiver
 {
+	void* UserData = nullptr;
+	void(*Functor)(void* userData, g2d::MouseButton button) = nullptr;
+	bool operator==(const MouseEventReceiver& other) const;
+};
+
+template<typename RECEIVER> class EventDelegate
+{
+	std::vector<RECEIVER> receivers;
 public:
-	void operator+=(const KeyEventReceiver&);
-	void operator-=(const KeyEventReceiver&);
-	void NotifyAll(g2d::KeyCode key) const;
-private:
-	std::vector<KeyEventReceiver> m_receivers;
+	void operator+=(const RECEIVER& receiver)
+	{
+		auto itFind = std::find(std::begin(receivers), std::end(receivers), receiver);
+		if (itFind == std::end(receivers)) receivers.push_back(receiver);
+	}
+
+	void operator-=(const RECEIVER& receiver)
+	{
+		auto itFind = std::find(std::begin(receivers), std::end(receivers), receiver);
+		if (itFind != std::end(receivers)) receivers.erase(itFind);
+	}
+
+	template<typename TFUNC> void Traversal(TFUNC func)
+	{
+		for (auto& r : receivers) func(r);
+	}
+};
+
+struct KeyEvent : public EventDelegate<KeyEventReceiver>
+{
+	void NotifyAll(g2d::KeyCode key);
+};
+
+struct MouseEvent : public EventDelegate<MouseEventReceiver>
+{
+	void NotifyAll(g2d::MouseButton button);
 };
 
 class Keyboard : public g2d::Keyboard
@@ -41,10 +70,10 @@ public:
 
 	void Update(uint32_t currentTimeStamp);
 
-	KeyEventDelegate OnPress;
-	KeyEventDelegate OnPressingBegin;
-	KeyEventDelegate OnPressing;
-	KeyEventDelegate OnPressingEnd;
+	KeyEvent OnPress;
+	KeyEvent OnPressingBegin;
+	KeyEvent OnPressing;
+	KeyEvent OnPressingEnd;
 
 private:
 	class KeyState
@@ -87,7 +116,7 @@ public:
 	void Update(uint32_t currentTimeStamp);
 
 public:	//g2d::Mouse
-	virtual const gml::coord& GetCursorPosition() const override; 
+	virtual const gml::coord& GetCursorPosition() const override;
 
 	virtual const gml::coord& GetCursorPressPosition(g2d::MouseButton button) const override;
 
@@ -95,9 +124,15 @@ public:	//g2d::Mouse
 
 	uint32_t GetRepeatingCount(g2d::MouseButton button) const override;
 
+	MouseEvent OnPress;
+	MouseEvent OnPressingBegin;
+	MouseEvent OnPressing;
+	MouseEvent OnPressingEnd;
+	MouseEvent OnMoving;
 private:
 	class ButtonState
 	{
+		bool repeated = false;
 		uint32_t repeatCount = 0;
 		uint32_t pressTimeStamp;
 		gml::coord pressCursorPos;
@@ -114,6 +149,11 @@ private:
 		ButtonState(g2d::MouseButton btn) : Button(btn) { }
 		void OnMessage(const g2d::Message& message, uint32_t currentTimeStamp);
 		void Update(uint32_t currentTimeStamp);
+		void ForceRelease();
+		std::function<void(ButtonState&)> OnPress = nullptr;
+		std::function<void(ButtonState&)> OnPressingBegin = nullptr;
+		std::function<void(ButtonState&)> OnPressing = nullptr;
+		std::function<void(ButtonState&)> OnPressingEnd = nullptr;
 	} m_buttons[3];
 
 	ButtonState& GetButton(g2d::MouseButton& button);
