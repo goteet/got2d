@@ -123,6 +123,8 @@ public:
 
 	virtual void OnLDragBegin(const g2d::Mouse& mouse, const g2d::Keyboard& keyboard) override
 	{
+		auto worldP = GetSceneNode()->GetScene()->GetMainCamera()->ScreenToWorld(mouse.GetCursorPosition());
+		m_dragOffset = GetSceneNode()->WorldToLocal(worldP);
 		g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 		for (int i = 0; i < 7; i++)
 		{
@@ -134,7 +136,7 @@ public:
 	{
 		auto worldP = GetSceneNode()->GetScene()->GetMainCamera()->ScreenToWorld(mouse.GetCursorPosition());
 		auto parentP = GetSceneNode()->WorldToParent(worldP);
-		GetSceneNode()->SetPosition(parentP);
+		GetSceneNode()->SetPosition(parentP - m_dragOffset);
 	}
 
 	virtual void OnLDragEnd(const g2d::Mouse& mouse, const g2d::Keyboard& keyboard) override
@@ -163,4 +165,5 @@ private:
 	g2d::Mesh* m_mesh;
 	g2d::Material* m_material;
 	std::vector<gml::color4> colors;
+	gml::vec2 m_dragOffset;
 };

@@ -238,6 +238,18 @@ void Scene::OnMousePressingBegin(g2d::MouseButton button)
 
 void Scene::MouseButtonState::OnPressing(::SceneNode* hitNode)
 {
+	//*  heart-beaten?
+	if (dragNode != nullptr)
+	{
+		if (hitNode != nullptr && hitNode != dragNode)
+		{
+			dragNode->OnDropping(hitNode, Button);
+		}
+		else
+		{
+			dragNode->OnDragging(Button);
+		}
+	}
 }
 
 void Scene::OnMousePressing(g2d::MouseButton button)
