@@ -108,7 +108,7 @@ void BaseNode::_Update(uint32_t deltaTime)
 	RemoveReleasedChildren();
 }
 
-::SceneNode* BaseNode::GetChildByIndex(uint32_t index) const
+::SceneNode* BaseNode::_GetChildByIndex(uint32_t index) const
 {
 	ENSURE(index < m_children.size());
 	return m_children[index];
@@ -327,7 +327,7 @@ void SceneNode::SetRenderingOrder(uint32_t& index)
 	{
 		return nullptr;
 	}
-	return m_bparent.GetChildByIndex(m_childID - 1);
+	return m_bparent._GetChildByIndex(m_childID - 1);
 }
 
 ::SceneNode* SceneNode::GetNextSibling() const
@@ -336,7 +336,7 @@ void SceneNode::SetRenderingOrder(uint32_t& index)
 	{
 		return nullptr;
 	}
-	return m_bparent.GetChildByIndex(m_childID + 1);
+	return m_bparent._GetChildByIndex(m_childID + 1);
 }
 
 void SceneNode::MoveToFront()

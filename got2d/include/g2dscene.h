@@ -240,6 +240,18 @@ namespace g2d
 		// 同级第一个节点返回nullptr
 		virtual SceneNode* GetNextSiblingNode() const = 0;
 
+		// 获取第一个孩子
+		// 如果没有孩子则返回nullptr
+		virtual g2d::SceneNode* FirstChild() const = 0;
+
+		// 获取最后一个孩子
+		// 如果没有孩子则返回nullptr
+		virtual g2d::SceneNode* LastChild() const = 0;
+
+		// 获取该索引值对应的孩子
+		// 如果没有找到则返回nullptr
+		virtual g2d::SceneNode* GetChildByIndex(uint32_t index) const = 0;
+
 		// 创建子节点，必须传入Entity对象
 		virtual SceneNode* CreateSceneNodeChild(Entity*, bool autoRelease) = 0;
 

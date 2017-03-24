@@ -52,7 +52,11 @@ protected:
 
 	void _Update(uint32_t deltaTime);
 
-	::SceneNode* GetChildByIndex(uint32_t index) const;
+	::SceneNode* _GetChildByIndex(uint32_t index) const;
+
+	::SceneNode* _FirstChild() const { return m_children.empty() ? nullptr : *m_children.begin(); };
+
+	::SceneNode* _LastChild() const { return m_children.empty() ? nullptr : m_children[m_children.size()-1]; }
 
 	uint32_t GetChildCount() const { return static_cast<uint32_t>(m_children.size()); }
 
@@ -162,6 +166,12 @@ public:	//g2d::SceneNode
 
 	virtual g2d::SceneNode* GetNextSiblingNode() const override { return GetNextSibling(); }
 
+	virtual g2d::SceneNode* FirstChild() const override { return _FirstChild(); }
+
+	virtual g2d::SceneNode* LastChild() const override { return _LastChild(); }
+
+	virtual g2d::SceneNode* GetChildByIndex(uint32_t index) const override { return _GetChildByIndex(index); }
+
 	virtual g2d::SceneNode* CreateSceneNodeChild(g2d::Entity* entity, bool autoRelease) override { return _CreateSceneNodeChild(m_scene, *this, *entity, autoRelease); }
 
 	virtual void RemoveFromParent() override { m_bparent.Remove(this); }
@@ -262,6 +272,12 @@ public: //g2d::SceneNode
 	virtual SceneNode* GetPrevSiblingNode() const override { return nullptr; }
 
 	virtual SceneNode* GetNextSiblingNode() const override { return nullptr; }
+
+	virtual g2d::SceneNode* FirstChild() const override { return _FirstChild(); }
+
+	virtual g2d::SceneNode* LastChild() const override { return _LastChild(); }
+
+	virtual g2d::SceneNode* GetChildByIndex(uint32_t index) const override { return _GetChildByIndex(index); }
 
 	virtual g2d::SceneNode* CreateSceneNodeChild(g2d::Entity* entity, bool autoRelease) override { return _CreateSceneNodeChild(*this, *entity, autoRelease); }
 
