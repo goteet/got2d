@@ -52,10 +52,10 @@ Quad::Quad()
 	m_aabb.expand(gml::vec2(-0.5f, -0.5f));
 	m_aabb.expand(gml::vec2(+0.5f, +0.5f));
 
-	vertices[0].texcoord.set(0, 0);
-	vertices[3].texcoord.set(0, 1);
-	vertices[2].texcoord.set(1, 1);
-	vertices[1].texcoord.set(1, 0);
+	vertices[0].texcoord.set(0, 1);
+	vertices[3].texcoord.set(0, 0);
+	vertices[2].texcoord.set(1, 0);
+	vertices[1].texcoord.set(1, 1);
 
 	vertices[0].vtxcolor = gml::color4::random();
 	vertices[1].vtxcolor = gml::color4::random();
@@ -69,11 +69,11 @@ Quad::Quad()
 		break;
 	case 1:
 		m_material = g2d::Material::CreateSimpleTexture();
-		m_material->GetPassByIndex(0)->SetTexture(0, g2d::Texture::LoadFromFile((rand() % 2) ? "test_alpha.bmp" : "test_alpha.png"), true);
+		m_material->GetPassByIndex(0)->SetTexture(0, g2d::Texture::LoadFromFile((rand() % 2) ? "palette8_100x128.bmp" : "dxt1_100x128.dds"), true);
 		break;
 	case 2:
 		m_material = g2d::Material::CreateColorTexture();
-		m_material->GetPassByIndex(0)->SetTexture(0, g2d::Texture::LoadFromFile((rand() % 2) ? "test_alpha.bmp" : "test_alpha.png"), true);
+		m_material->GetPassByIndex(0)->SetTexture(0, g2d::Texture::LoadFromFile((rand() % 2) ? "dxt5a_128x128.dds" : "rgba_128x128.png"), true);
 		break;
 	}
 }

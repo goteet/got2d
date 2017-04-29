@@ -1,3 +1,5 @@
+#include <img/file_data.h>
+#include <img/img_data.h>
 #include "engine.h"
 #include "render_system.h"
 
@@ -39,50 +41,65 @@ void Texture::Release()
 	}
 }
 
-void UploadImageToTexture(rhi::Texture2D* texture, uint8_t* data, bool hasAlpha)
+
+void UploadImageRawToTexture(rhi::Texture2D* texture, uint8_t* data, uint32_t pitch, uint32_t height)
 {
 	auto mappedResouce = GetRenderSystem()->GetContext()->Map(texture);
 	if (mappedResouce.success)
 	{
-		uint8_t* colorBuffer = static_cast<uint8_t*>(mappedResouce.data);
-		if (hasAlpha)
+		auto colorBuffer = static_cast<uint8_t*>(mappedResouce.data);
+		for (uint32_t i = 0; i < height; i++)
 		{
-			auto srcPitch = texture->GetWidth() * 4;
-			auto height = texture->GetHeight();
-			for (uint32_t i = 0; i < height; i++)
-			{
-				auto dstPtr = colorBuffer + i * mappedResouce.linePitch;
-				auto srcPtr = data + i * srcPitch;
-				memcpy(dstPtr, srcPtr, srcPitch);
-			}
+			auto dstPtr = colorBuffer + i * mappedResouce.linePitch;
+			auto srcPtr = data + i * pitch;
+			memcpy(dstPtr, srcPtr, pitch);
 		}
-		else
-		{
-
-			auto width = texture->GetWidth();
-			auto height = texture->GetHeight();
-			auto srcPitch = width * 3;
-			for (uint32_t i = 0; i < height; i++)
-			{
-				auto dstPtr = colorBuffer + i * mappedResouce.linePitch;
-				auto srcPtr = data + i * srcPitch;
-
-				for (uint32_t j = 0; j < width; j++)
-				{
-					memcpy(dstPtr + j * 4, srcPtr + j * 3, 3);
-					dstPtr[3 + j * 4] = 255;
-				}
-			}
-		}
-
 		GetRenderSystem()->GetContext()->Unmap(texture);
 		GetRenderSystem()->GetContext()->GenerateMipmaps(texture);
 	}
 }
 
-#include "engine.h"
-#include <img/file_data.h>
-#include <img/img_data.h>
+void UploadImageBGRAToTexture(rhi::Texture2D* texture, uint8_t* data, uint32_t width, uint32_t height)
+{
+	UploadImageRawToTexture(texture, data, width * 4, height);
+}
+
+void UploadImageBGRToTexture(rhi::Texture2D* texture, uint8_t* data, uint32_t width, uint32_t height)
+{
+	auto mappedResouce = GetRenderSystem()->GetContext()->Map(texture);
+	if (mappedResouce.success)
+	{
+		auto colorBuffer = static_cast<uint8_t*>(mappedResouce.data);
+		for (uint32_t i = 0; i < height; i++)
+		{
+			auto dstPtr = colorBuffer + i * mappedResouce.linePitch;
+			auto srcPtr = data + i * width * 3;
+			for (uint32_t j = 0; j < width; j++)
+			{
+				memcpy(dstPtr + j * 4, srcPtr + j * 3, 3);
+				dstPtr[3 + j * 4] = 255;
+			}
+		}
+		GetRenderSystem()->GetContext()->Unmap(texture);
+		GetRenderSystem()->GetContext()->GenerateMipmaps(texture);
+	}
+}
+
+void UploadImageToTexture(rhi::Texture2D* texture, const img_data& img)
+{
+	if (img.format == color_format::bgr24)
+	{
+		UploadImageBGRToTexture(texture, img.buffer, img.width, img.height);
+	}
+	else if (img.format == color_format::bgra32)
+	{
+		UploadImageBGRAToTexture(texture, img.buffer, img.width, img.height);
+	}
+	else
+	{
+		UploadImageRawToTexture(texture, img.buffer, img.pitch, img.block_height);
+	}
+}
 
 bool TexturePool::CreateDefaultTexture()
 {
@@ -99,7 +116,7 @@ bool TexturePool::CreateDefaultTexture()
 			0,0,0,255,255,255,
 			255,255,255,0,0,0
 		};
-		UploadImageToTexture(m_defaultTexture, boardData, false);
+		UploadImageBGRToTexture(m_defaultTexture, boardData, 2, 2);
 		return true;
 	}
 	else
@@ -110,33 +127,42 @@ bool TexturePool::CreateDefaultTexture()
 
 bool TexturePool::LoadTextureFromFile(std::string resourcePath)
 {
-	file_data f;
-	if (!load_file(resourcePath.c_str(), f))
+	file_data f = read_file(resourcePath.c_str());
+	if (!f.is_valid())
 		return false;
 
-	img_data img;
-	auto result = true;
-
-	result = read_image(f.buffer, img);
-	destroy_file_data(f);
-
-	if (result)
+	img_data img = read_image(f.buffer);
+	f.destroy();
+	bool result = false;
+	if (img.is_valid())
 	{
+		rhi::TextureFormat format;
+		switch (img.format)
+		{
+		case color_format::bgr24:format = rhi::TextureFormat::BGRA; break;
+		case color_format::bgra32:format = rhi::TextureFormat::BGRA; break;
+		case color_format::dxt1:format = rhi::TextureFormat::DXT1; break;
+		case color_format::dxt2:
+		case color_format::dxt3:format = rhi::TextureFormat::DXT3; break;
+		case color_format::dxt4:
+		case color_format::dxt5:format = rhi::TextureFormat::DXT5; break;
+		}
+
 		auto tex = GetRenderSystem()->GetDevice()->CreateTexture2D(
-			rhi::TextureFormat::RGBA,
+			format,
 			rhi::ResourceUsage::Dynamic,
 			rhi::TextureBinding::ShaderResource,
 			img.width, img.height);
+
 		if (tex != nullptr)
 		{
-			UploadImageToTexture(tex, img.raw_data, img.has_alpha);
+			UploadImageToTexture(tex, img);
 			m_textures[resourcePath] = tex;
+			result = true;
 		}
-
-		destroy_img_data(img);
-		return result;
+		img.destroy();
 	}
-	return false;
+	return result;
 }
 
 void TexturePool::Destroy()

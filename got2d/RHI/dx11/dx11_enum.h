@@ -32,7 +32,7 @@ constexpr DXGI_FORMAT kTextureFormat[] =
 {
 	DXGI_FORMAT_UNKNOWN,			// Unknown
 	DXGI_FORMAT_R8G8B8A8_UNORM,		// RGBA
-	DXGI_FORMAT_B8G8R8X8_UNORM,		// BGRA
+	DXGI_FORMAT_B8G8R8A8_UNORM,		// BGRA
 	DXGI_FORMAT_BC1_UNORM,			// DXT1
 	DXGI_FORMAT_BC2_UNORM,			// DXT3
 	DXGI_FORMAT_BC3_UNORM,			// DXT5
@@ -110,7 +110,7 @@ inline rhi::TextureFormat GetTextureFormatDX11(DXGI_FORMAT format)
 	default:
 	case DXGI_FORMAT_UNKNOWN: return rhi::TextureFormat::Unknown;
 	case DXGI_FORMAT_R8G8B8A8_UNORM: return rhi::TextureFormat::RGBA;
-	case DXGI_FORMAT_B8G8R8X8_UNORM: return rhi::TextureFormat::BGRA;
+	case DXGI_FORMAT_B8G8R8A8_UNORM: return rhi::TextureFormat::BGRA;
 	case DXGI_FORMAT_BC1_UNORM: return rhi::TextureFormat::DXT1;
 	case DXGI_FORMAT_BC2_UNORM: return rhi::TextureFormat::DXT3;
 	case DXGI_FORMAT_BC3_UNORM: return rhi::TextureFormat::DXT5;

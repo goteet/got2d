@@ -284,19 +284,16 @@ rhi::BlendState* Device::CreateBlendState(bool enabled, rhi::BlendFactor source,
 	D3D11_BLEND_DESC blendDesc;
 	blendDesc.AlphaToCoverageEnable = FALSE;
 	blendDesc.IndependentBlendEnable = FALSE;
-	for (int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++)
-	{
-		blendDesc.RenderTarget[i].BlendEnable = enabled ? TRUE : FALSE;
+	blendDesc.RenderTarget[0].BlendEnable = enabled ? TRUE : FALSE;
 
-		blendDesc.RenderTarget[i].SrcBlend = srcBlend;
-		blendDesc.RenderTarget[i].DestBlend = dstBlend;
-		blendDesc.RenderTarget[i].BlendOp = blendOp;
-		// default setting
-		blendDesc.RenderTarget[i].SrcBlendAlpha = D3D11_BLEND_ONE;
-		blendDesc.RenderTarget[i].DestBlendAlpha = D3D11_BLEND_ZERO;
-		blendDesc.RenderTarget[i].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-		blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	}
+	blendDesc.RenderTarget[0].SrcBlend = srcBlend;
+	blendDesc.RenderTarget[0].DestBlend = dstBlend;
+	blendDesc.RenderTarget[0].BlendOp = blendOp;
+	// default setting
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 	ID3D11BlendState* blendState = nullptr;
 	if (S_OK == m_d3dDevice.CreateBlendState(&blendDesc, &blendState))
