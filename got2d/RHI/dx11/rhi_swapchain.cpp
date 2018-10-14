@@ -1,6 +1,7 @@
 #include "inner_RHI.h"
 #include "../../source/scope_utility.h"
 #include "dx11_enum.h"
+#include "cxx_scope.h"
 
 ::Texture2D* RenderTarget::GetColorBufferImplByIndex(rhi::RTIndex index) const
 {
@@ -23,6 +24,8 @@ RenderTarget::~RenderTarget()
 		t->Release();
 	}
 	m_colorBuffers.clear();
+
+	cxx::safe_release(m_depthStencilBuffer);
 }
 
 
@@ -43,7 +46,7 @@ SwapChain::SwapChain(::Device& device, IDXGISwapChain& swapChain, bool useDepthS
 
 SwapChain::~SwapChain()
 {
-	cxx::safe_release(mRenderTarget);
+	cxx::safe_release(m_renderTarget);
 	if (IsFullscreen())
 	{
 		SetFullscreen(false);
@@ -53,7 +56,7 @@ SwapChain::~SwapChain()
 
 bool SwapChain::OnResize(unsigned int width, unsigned int height)
 {
-	cxx::safe_release(mRenderTarget);
+	cxx::safe_release(m_renderTarget);
 	if (S_OK == m_swapChain.ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0))
 	{
 		if (CreateRenderTarget())
@@ -98,7 +101,7 @@ void SwapChain::UpdateWindowSize()
 
 bool SwapChain::CreateRenderTarget()
 {
-	if (mRenderTarget != nullptr)
+	if (m_renderTarget != nullptr)
 		return false;
 
 	ID3D11Texture2D* backBuffer = nullptr;
@@ -115,7 +118,7 @@ bool SwapChain::CreateRenderTarget()
 		D3D11_TEXTURE2D_DESC bbDesc;
 		backBuffer->GetDesc(&bbDesc);
 		std::vector<::Texture2D*> colorBuffers(1);
-		colorBuffers[0] = new ::Texture2D(*backBuffer, *rtView, nullptr,
+		colorBuffers[0] = new ::Texture2D(backBuffer, rtView, nullptr,
 			GetTextureFormatDX11(bbDesc.Format),
 			bbDesc.Width, bbDesc.Height);
 
@@ -137,11 +140,11 @@ bool SwapChain::CreateRenderTarget()
 				return false;
 
 			fbWhenCreateDSFail.dismiss();
-			mRenderTarget = new ::RenderTarget(bbDesc.Width, bbDesc.Height, std::move(colorBuffers), dsTexture);
+			m_renderTarget = new ::RenderTarget(bbDesc.Width, bbDesc.Height, std::move(colorBuffers), dsTexture);
 		}
 		else
 		{
-			mRenderTarget = new ::RenderTarget(bbDesc.Width, bbDesc.Height, std::move(colorBuffers), nullptr);
+			m_renderTarget = new ::RenderTarget(bbDesc.Width, bbDesc.Height, std::move(colorBuffers), nullptr);
 		}
 		return true;
 	}

@@ -1,6 +1,6 @@
 #include "inner_RHI.h"
 #include "../../source/scope_utility.h"
-
+#include "cxx_scope.h"
 rhi::RHICreationResult rhi::CreateRHI()
 {
 	ID3D11Device* d3dDevice = nullptr;
@@ -80,7 +80,7 @@ BlendState::~BlendState()
 	m_blendState.Release();
 }
 
-Texture2D::Texture2D(ID3D11Texture2D& texture, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height)
+Texture2D::Texture2D(ID3D11Texture2D* texture, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height)
 	: m_texture(texture)
 	, m_srView(srView)
 	, m_rtView(nullptr)
@@ -91,10 +91,10 @@ Texture2D::Texture2D(ID3D11Texture2D& texture, ID3D11ShaderResourceView* srView,
 {
 }
 
-Texture2D::Texture2D(ID3D11Texture2D& texture, ID3D11RenderTargetView& view, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height)
+Texture2D::Texture2D(ID3D11Texture2D* texture, ID3D11RenderTargetView* view, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height)
 	: m_texture(texture)
 	, m_srView(srView)
-	, m_rtView(&view)
+	, m_rtView(view)
 	, m_dsView(nullptr)
 	, m_width(width)
 	, m_height(height)
@@ -102,11 +102,11 @@ Texture2D::Texture2D(ID3D11Texture2D& texture, ID3D11RenderTargetView& view, ID3
 {
 }
 
-Texture2D::Texture2D(ID3D11Texture2D & texture, ID3D11DepthStencilView & view, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height)
+Texture2D::Texture2D(ID3D11Texture2D* texture, ID3D11DepthStencilView* view, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height)
 	: m_texture(texture)
 	, m_srView(srView)
 	, m_rtView(nullptr)
-	, m_dsView(&view)
+	, m_dsView(view)
 	, m_width(width)
 	, m_height(height)
 	, m_format(format)
@@ -115,5 +115,8 @@ Texture2D::Texture2D(ID3D11Texture2D & texture, ID3D11DepthStencilView & view, I
 
 Texture2D::~Texture2D()
 {
-	m_texture.Release();
+	cxx::safe_release(m_srView);
+	cxx::safe_release(m_rtView);
+	cxx::safe_release(m_dsView);
+	cxx::safe_release(m_texture);
 }

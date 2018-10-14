@@ -39,14 +39,25 @@ namespace g2d
 			Error,
 		};
 
-		/** \brief Create an Engine Instance;
+		/** \brief Create and Initialize Engine Instance.
 		*
 		*/
 		static InitialResult Initialize(const CreationConfig& config);
 
+		/** \brief Shutdown and Destroy Engine.
+		*
+		*/
 		static void Uninitialize();
 
+		/** \brief Get the Singleton Instance;
+		*
+		*/
 		static Engine* GetInstance();
+
+		/** \brief Check Whether the Engine has been initialized.
+		*
+		*/
+		static bool IsInitialized();
 
 		/**
 		*

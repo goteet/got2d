@@ -108,7 +108,7 @@ private:
 	} mMouseButtonState[3];
 
 private:
-	std::unique_ptr<::SceneNode> mRootNode;
+	::SceneNode* mRootNode;
 
 	SpatialGraph mSpatial;
 	std::vector<::Camera*> mCameraList;

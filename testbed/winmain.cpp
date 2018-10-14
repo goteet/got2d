@@ -5,8 +5,8 @@
 
 namespace g2d
 {
-	class Scene;
-	class SceneNode;
+	struct Scene;
+	struct SceneNode;
 }
 
 class Testbed
@@ -46,7 +46,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	// ‘À––≥Ã–Ú
-	if (framework.Initial(nCmdShow, "/../extern/res/win32_test/"))
+	if (framework.Initial(nCmdShow, "../extern/res/win32_test/"))
 	{
 		return framework.Start();
 	}
@@ -54,10 +54,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 }
 
 #include "hexagon.h"
-#include <got2d/include/g2dengine.h>
-#include <got2d/include/g2drender.h>
-#include <got2d/include/g2dscene.h>
-#include <gml/gmlmatrix.h>
+#include "g2dengine.h"
+#include "g2drender.h"
+#include "g2dscene.h"
 
 g2d::SceneNode* CreateQuadNode(g2d::SceneNode* parent);
 
@@ -79,11 +78,11 @@ public: //implement
 		}
 		else if (key == g2d::KeyCode::KeyR)
 		{
-			GetSceneNode()->SetRight(gml::mat22::rotate(gml::degree(45)) * gml::vec2::right());
+			GetSceneNode()->SetRightDirection(cxx::float2x2::rotate(cxx::degree<float>(45)) * cxx::float2(1, 0));
 		}
 		else if (key == g2d::KeyCode::KeyQ)
 		{
-			GetSceneNode()->SetUp(gml::mat22::rotate(gml::degree(-45)) * gml::vec2::up());
+			GetSceneNode()->SetUpDirection(cxx::float2x2::rotate(cxx::degree<float>(-45)) * cxx::float2(0, 1));
 		}
 	}
 
@@ -91,27 +90,27 @@ public: //implement
 	{
 		if (key == g2d::KeyCode::ArrowLeft)
 		{
-			GetSceneNode()->SetPosition(GetSceneNode()->GetPosition() + gml::vec2::left());
+			GetSceneNode()->SetPosition(GetSceneNode()->GetPosition() + cxx::float2(-1, 0));
 		}
 		else if (key == g2d::KeyCode::ArrowRight)
 		{
-			GetSceneNode()->SetPosition(GetSceneNode()->GetPosition() + gml::vec2::right());
+			GetSceneNode()->SetPosition(GetSceneNode()->GetPosition() + cxx::float2(1, 0));
 		}
 		else if (key == g2d::KeyCode::ArrowUp)
 		{
-			GetSceneNode()->SetPosition(GetSceneNode()->GetPosition() + gml::vec2::up());
+			GetSceneNode()->SetPosition(GetSceneNode()->GetPosition() + cxx::float2(0, 1));
 		}
 		else if (key == g2d::KeyCode::ArrowDown)
 		{
-			GetSceneNode()->SetPosition(GetSceneNode()->GetPosition() + gml::vec2::down());
+			GetSceneNode()->SetPosition(GetSceneNode()->GetPosition() + cxx::float2(0, -1));
 		}
 		else if (key == g2d::KeyCode::KeyE)
 		{
-			GetSceneNode()->SetRight(gml::mat22::rotate(gml::degree(1)) * GetSceneNode()->GetRight());
+			GetSceneNode()->SetRightDirection(cxx::float2x2::rotate(cxx::degree<float>(1)) * GetSceneNode()->GetRightDirection());
 		}
 		else if (key == g2d::KeyCode::KeyW)
 		{
-			GetSceneNode()->SetUp(gml::mat22::rotate(gml::degree(-1)) * GetSceneNode()->GetUp());
+			GetSceneNode()->SetUpDirection(cxx::float2x2::rotate(cxx::degree<float>(-1)) * GetSceneNode()->GetUpDirection());
 		}
 	}
 };
@@ -119,8 +118,8 @@ public: //implement
 
 g2d::SceneNode* CreateQuadNode(g2d::SceneNode* parent)
 {
-	auto quad = g2d::Quad::Create()->SetSize(gml::vec2(100, 120));
-	auto child = parent->CreateChild()->SetPosition(gml::vec2(50, 20));
+	auto quad = g2d::Quad::Create()->SetSize(cxx::float2(100, 120));
+	auto child = parent->CreateChild()->SetPosition(cxx::float2(50, 20));
 	child->AddComponent(quad, true);
 	child->AddComponent(new KeyboardMoving(), true);
 	child->SetStatic(false);
@@ -130,28 +129,28 @@ g2d::SceneNode* CreateQuadNode(g2d::SceneNode* parent)
 
 void Testbed::Start()
 {
-	mainScene = g2d::GetEngine()->CreateNewScene(2 << 10);
+	mainScene = g2d::Engine::GetInstance()->CreateNewScene(2 << 10);
 
 	// board
-	auto boardNode = mainScene->CreateChild();
+	auto boardNode = mainScene->GetRootNode()->CreateChild();
 	boardNode->SetPosition({ -200.0f, 0.0f });
 	boardNode->AddComponent(new HexagonBoard(), true);
 
 	//hexgon node
-	HexagonNode = mainScene->CreateChild();
+	HexagonNode = mainScene->GetRootNode()->CreateChild();
 	HexagonNode->SetPosition({ 0,0 });
 	HexagonNode->AddComponent(new Hexagon(), true);
 	HexagonNode->AddComponent(new EntityDragging(), true);
 
-	auto quad = g2d::Quad::Create()->SetSize(gml::vec2(100, 120));
-	auto node = mainScene->CreateChild()->SetPosition(gml::vec2(300, 0));
+	auto quad = g2d::Quad::Create()->SetSize(cxx::float2(100, 120));
+	auto node = mainScene->GetRootNode()->CreateChild()->SetPosition(cxx::float2(300, 0));
 	node->AddComponent(quad, true);
 	node->SetStatic(true);
 
 	for (int i = 0; i < 5; i++)
 	{
-		auto quad = g2d::Quad::Create()->SetSize(gml::vec2(100, 120));
-		auto child = node->CreateChild()->SetPosition(gml::vec2(50, 60));
+		auto quad = g2d::Quad::Create()->SetSize(cxx::float2(100, 120));
+		auto child = node->CreateChild()->SetPosition(cxx::float2(50, 60));
 		child->AddComponent(quad, true);
 		child->AddComponent(new KeyboardMoving(), true);
 		child->SetStatic(true);
@@ -169,14 +168,14 @@ void Testbed::End()
 
 bool Testbed::Update(uint32_t deltaTime)
 {
-	g2d::GetEngine()->Update(deltaTime);
-	g2d::GetEngine()->GetRenderSystem()->BeginRender();
+	g2d::Engine::GetInstance()->Update(deltaTime);
+	g2d::Engine::GetInstance()->GetRenderSystem()->BeginRender();
 	mainScene->Render();
-	g2d::GetEngine()->GetRenderSystem()->EndRender();
+	g2d::Engine::GetInstance()->GetRenderSystem()->EndRender();
 	return true;
 }
 
 void Testbed::OnMessage(const g2d::Message& message)
 {
-	g2d::GetEngine()->OnMessage(message);
+	g2d::Engine::GetInstance()->OnMessage(message);
 }

@@ -3,13 +3,12 @@
 #include <cinttypes>
 #include <functional>
 #include <string>
-#include <gml/gmlrect.h>
-#include <got2d/include/g2dmessage.h>
-
+#include "g2dmessage.h"
+#include "cxx_math.h"
 namespace g2d
 {
-	class Mesh;
-	class Scene;
+	struct Mesh;
+	struct Scene;
 }
 
 class AutoWinClassRegister
@@ -36,8 +35,8 @@ public:
 	bool Initial(int nCmdShow, const std::string& resPath);
 	int Start();
 	void QuitApp();
-	void SetCursorPos(const gml::coord&);
-	gml::coord GetCursorPos();
+	void SetCursorPos(const cxx::point2d<int>&);
+	cxx::point2d<int> GetCursorPos();
 	const std::wstring& GetWindowTitle();
 	uint32_t GetFrameCount() const;
 	uint32_t GetElapsedTime() const;

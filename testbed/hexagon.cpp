@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <gml/gmlconversion.h>
 #include "hexagon.h"
 
 constexpr float kHexagonMargin = 2.0f;
@@ -8,7 +7,7 @@ constexpr float kHexagonRealSize = kHexagonSize - kHexagonMargin;
 constexpr float kHeightStride = kHexagonSize * 1.5f;
 const float kWidthStride = kHexagonSize * sqrt(3.0f);
 
-g2d::Mesh * CreateHexagonMesh(float size, gml::color4 color, gml::aabb2d* aabb)
+g2d::Mesh * CreateHexagonMesh(float size, cxx::color4f color, cxx::aabb2d<float>* aabb)
 {
 	auto mesh = g2d::Mesh::Create(7, 6 * 3);
 
@@ -30,22 +29,22 @@ g2d::Mesh * CreateHexagonMesh(float size, gml::color4 color, gml::aabb2d* aabb)
 	{
 		g2d::GeometryVertex* vertices = mesh->GetRawVertices();
 
-		vertices[0].position.set(0.0f, 0.0f);
-		vertices[0].texcoord.set(0.5f, 0.5f);
-		vertices[0].vtxcolor = color;
+		vertices[0].Position = cxx::point2d<float>::origin();
+		vertices[0].Texcoord = cxx::point2d<float>(0.5f, 0.5f);
+		vertices[0].VertexColor = color;
 
 		for (int i = 1; i < 7; i++)
 		{
-			gml::vec2 v(0, 1);
+			cxx::float2 v(0, 1);
 			float d = (i - 1) * 360.0f / 6;
-			v = gml::mat22::rotate((gml::radian)gml::degree(d)) *  v;
-			vertices[i].position = v * (size);
-			vertices[i].texcoord = v;
-			vertices[i].vtxcolor = color;
+			v = cxx::float2x2::rotate(cxx::degree<float>(d)) *  v;
+			vertices[i].Position = v * (size);
+			vertices[i].Texcoord = v;
+			vertices[i].VertexColor = color;
 
 			if (aabb != nullptr)
 			{
-				aabb->expand(vertices[i].position);
+				aabb->expand(vertices[i].Position);
 			}
 		}
 	}
@@ -54,7 +53,7 @@ g2d::Mesh * CreateHexagonMesh(float size, gml::color4 color, gml::aabb2d* aabb)
 
 void Hexagon::OnRender()
 {
-	g2d::GetEngine()->GetRenderSystem()->RenderMesh(
+	g2d::Engine::GetInstance()->GetRenderSystem()->RenderMesh(
 		g2d::RenderLayer::Default,
 		m_mesh, m_material,
 		GetSceneNode()->GetWorldMatrix());
@@ -63,10 +62,10 @@ void Hexagon::OnRender()
 
 Hexagon::Hexagon()
 {
-	m_aabb.empty();
-	gml::aabb2d HexagonAABB;
-	m_lastColor = m_color = gml::color4::random();
-	gml::mat32 transform = gml::mat32::identity();
+	m_aabb.clear();
+	cxx::aabb2d<float> HexagonAABB;
+	m_lastColor = m_color = cxx::color4f::random();
+	cxx::float2x3 transform = cxx::float2x3::identity();
 
 	auto HexagonMesh = CreateHexagonMesh(kHexagonSize - kHexagonMargin, m_color, &HexagonAABB);
 	m_mesh = g2d::Mesh::Create(0, 0);
@@ -78,9 +77,9 @@ Hexagon::Hexagon()
 		for (int h = 0; h < line; h++)
 		{
 			float x = (h - line / 2) * kWidthStride + xOffset;
-			transform = gml::mat32::translate(x, y);
+			transform = cxx::float2x3::translate(x, y);
 			m_mesh->Merge(HexagonMesh, transform);
-			auto hexagonWorldAABB = gml::transform(transform, HexagonAABB);
+			auto hexagonWorldAABB = cxx::transform(transform, HexagonAABB);
 			m_aabb.expand(hexagonWorldAABB);
 		}
 	}
@@ -94,19 +93,19 @@ Hexagon::~Hexagon()
 	m_material->Release();
 }
 
-const gml::color4& Hexagon::GetColor()
+const cxx::color4f& Hexagon::GetColor()
 {
 	return m_color;
 }
 
-void Hexagon::SetColor(const gml::color4 & color)
+void Hexagon::SetColor(const cxx::color4f & color)
 {
 	m_color = color;
 	uint32_t count = m_mesh->GetVertexCount();
 	g2d::GeometryVertex* vertices = m_mesh->GetRawVertices();
 	for (uint32_t i = 0; i < count; i++)
 	{
-		vertices[i].vtxcolor = color;
+		vertices[i].VertexColor = color;
 	}
 }
 
@@ -117,7 +116,7 @@ void HexagonBoard::OnInitial()
 
 inline void HexagonBoard::OnRender()
 {
-	g2d::GetEngine()->GetRenderSystem()->RenderMesh(
+	g2d::Engine::GetInstance()->GetRenderSystem()->RenderMesh(
 		g2d::RenderLayer::Default,
 		m_mesh, m_material,
 		GetSceneNode()->GetWorldMatrix());
@@ -125,7 +124,7 @@ inline void HexagonBoard::OnRender()
 
 void Hexagon::OnLClick(const g2d::Mouse & mouse, const g2d::Keyboard & keyboard)
 {
-	SetColor(gml::color4::random());
+	SetColor(cxx::color4f::random());
 }
 
 void Hexagon::OnCursorEnterFrom(g2d::SceneNode * adjacency, const g2d::Mouse & mouse, const g2d::Keyboard & keyboard)
@@ -140,7 +139,7 @@ void Hexagon::OnCursorLeaveTo(g2d::SceneNode * adjacency, const g2d::Mouse & mou
 
 void Hexagon::OnLDragBegin(const g2d::Mouse & mouse, const g2d::Keyboard & keyboard)
 {
-	SetColor(gml::color4::yellow());
+	SetColor(cxx::color4f::yellow());
 }
 
 void Hexagon::OnLDragEnd(const g2d::Mouse & mouse, const g2d::Keyboard & keyboard)
@@ -152,7 +151,7 @@ void Hexagon::OnKeyPress(g2d::KeyCode key, const g2d::Mouse & mouse, const g2d::
 {
 	if ((int)key == 'C')
 	{
-		m_lastColor = gml::color4::random();
+		m_lastColor = cxx::color4f::random();
 		SetColor(m_lastColor);
 	}
 	else if ((int)key == 'X')
@@ -164,11 +163,11 @@ void Hexagon::OnKeyPress(g2d::KeyCode key, const g2d::Mouse & mouse, const g2d::
 void HexagonBoard::OnCursorHovering(const g2d::Mouse & mouse, const g2d::Keyboard & keyboard)
 {
 	auto cursor = mouse.GetCursorPosition();
-	auto pos = GetSceneNode()->GetScene()->GetMainCamera()->ScreenToWorld(cursor);
+	auto pos = GetSceneNode()->GetScene()->GetDefaultCamera()->ScreenToWorld(cursor);
 	pos = GetSceneNode()->WorldToLocal(pos);
 	int x, y;
 	PositionToHex(pos, x, y);
-	SetHexagonColor(gml::color4::random(), x, y);
+	SetHexagonColor(cxx::color4f::random(), x, y);
 }
 
 inline void HexagonBoard::OnCursorLeaveTo(g2d::SceneNode* adjacency, const g2d::Mouse & mouse, const g2d::Keyboard & keyboard)
@@ -178,10 +177,10 @@ inline void HexagonBoard::OnCursorLeaveTo(g2d::SceneNode* adjacency, const g2d::
 
 HexagonBoard::HexagonBoard()
 {
-	m_aabb.empty();
-	gml::aabb2d HexagonAABB;
-	gml::color4 boardColor = gml::color4::gray();
-	gml::mat32 transform = gml::mat32::identity();
+	m_aabb.clear();
+	cxx::aabb2d<float> HexagonAABB;
+	cxx::color4f boardColor = cxx::color4f::gray();
+	cxx::float2x3 transform = cxx::float2x3::identity();
 
 
 	auto HexagonMesh = CreateHexagonMesh(kHexagonSize - kHexagonMargin, boardColor, &HexagonAABB);
@@ -194,9 +193,9 @@ HexagonBoard::HexagonBoard()
 		for (int h = 0; h < line; h++)
 		{
 			float x = (h - line / 2) * kWidthStride + xOffset;
-			transform = gml::mat32::translate(x, y);
+			transform = cxx::float2x3::translate(x, y);
 			m_mesh->Merge(HexagonMesh, transform);
-			auto hexagonWorldAABB = gml::transform(transform, HexagonAABB);
+			auto hexagonWorldAABB = cxx::transform(transform, HexagonAABB);
 			m_aabb.expand(hexagonWorldAABB);
 		}
 	}
@@ -208,9 +207,9 @@ HexagonBoard::HexagonBoard()
 		for (int h = 0; h < line; h++)
 		{
 			float x = (h - line / 2) * kWidthStride + xOffset;
-			transform = gml::mat32::translate(x, y);
+			transform = cxx::float2x3::translate(x, y);
 			m_mesh->Merge(HexagonMesh, transform);
-			auto hexagonWorldAABB = gml::transform(transform, HexagonAABB);
+			auto hexagonWorldAABB = cxx::transform(transform, HexagonAABB);
 			m_aabb.expand(hexagonWorldAABB);
 		}
 	}
@@ -226,7 +225,7 @@ HexagonBoard::~HexagonBoard()
 	m_material->Release();
 }
 
-void HexagonBoard::SetHexagonColor(gml::color4 color, int q, int r)
+void HexagonBoard::SetHexagonColor(cxx::color4f color, int q, int r)
 {
 	int index = HexToIndex(q, r);
 	if (index != m_lastIndex)
@@ -237,13 +236,13 @@ void HexagonBoard::SetHexagonColor(gml::color4 color, int q, int r)
 		auto end = (index + 1) * 7;
 		for (int i = beg; i < end; i++)
 		{
-			vertices[i].vtxcolor = color;
+			vertices[i].VertexColor = color;
 		}
 	}
-	
+
 }
 
-void HexagonBoard::PositionToHex(gml::vec2 pos, int & outQ, int & outR)
+void HexagonBoard::PositionToHex(cxx::float2 pos, int & outQ, int & outR)
 {
 	float x = (pos.x * sqrt(3.0f) / 3.0f - pos.y / 3.0f) / kHexagonSize;
 	float z = pos.y * 2.0f / 3.0f / kHexagonSize;
@@ -276,9 +275,9 @@ void HexagonBoard::PositionToHex(gml::vec2 pos, int & outQ, int & outR)
 
 int HexagonBoard::HexToIndex(int q, int r)
 {
-	int x = gml::clamp(q, -4, 4);
-	int z = gml::clamp(r, -4, 4);
-	int y = gml::clamp(-x - z, -4, 4);
+	int x = cxx::clamp(q, -4, 4);
+	int z = cxx::clamp(r, -4, 4);
+	int y = cxx::clamp(-x - z, -4, 4);
 	x = -z - y;
 	int absz = abs(z);
 

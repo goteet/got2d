@@ -16,6 +16,4 @@ set_target_properties(got2d_testbed_win32 PROPERTIES COMPILE_DEFINITIONS UNICODE
 set_target_properties(got2d_testbed_win32 PROPERTIES COMPILE_DEFINITIONS _UNICODE)
 get_target_property(TESTBED_OUTPUT_DIR got2d_testbed_win32 RUNTIME_OUTPUT_DIRECTORY) 
 set_target_properties(got2d_testbed_win32 PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${TESTBED_OUTPUT_DIR})
-target_link_libraries(got2d_testbed_win32 got2d gml winmm.lib)
-
-source_group(gml REGULAR_EXPRESSION "gml*")
+target_link_libraries(got2d_testbed_win32 got2d cxx winmm.lib)

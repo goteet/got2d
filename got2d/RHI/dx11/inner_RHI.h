@@ -3,7 +3,6 @@
 #include <d3d11.h>
 #include <vector>
 #include "../RHI.h"
-#include "cxx_scope.h"
 
 class Device;
 class Context;
@@ -51,27 +50,27 @@ public:
 	virtual bool IsDepthStencil() const override { return m_dsView != nullptr; }
 
 public:
-	Texture2D(ID3D11Texture2D& texture, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height);
+	Texture2D(ID3D11Texture2D* texture, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height);
 
-	Texture2D(ID3D11Texture2D& texture, ID3D11RenderTargetView& view, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height);
+	Texture2D(ID3D11Texture2D* texture, ID3D11RenderTargetView* view, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height);
 
-	Texture2D(ID3D11Texture2D& texture, ID3D11DepthStencilView& view, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height);
+	Texture2D(ID3D11Texture2D* texture, ID3D11DepthStencilView* view, ID3D11ShaderResourceView* srView, rhi::TextureFormat format, unsigned int width, unsigned int height);
 
 	~Texture2D();
 
-	ID3D11Texture2D* GetRaw() { return &m_texture; }
+	ID3D11Texture2D* GetRaw() { return m_texture; }
 
-	ID3D11RenderTargetView* GetRTView() { return m_rtView.get(); }
+	ID3D11RenderTargetView* GetRTView() { return m_rtView; }
 
-	ID3D11DepthStencilView* GetDSView() { return m_dsView.get(); }
+	ID3D11DepthStencilView* GetDSView() { return m_dsView; }
 
-	ID3D11ShaderResourceView* GetSRView() { return m_srView.get(); }
+	ID3D11ShaderResourceView* GetSRView() { return m_srView; }
 
 private:
-	ID3D11Texture2D& m_texture;
-	cxx::unique_i<ID3D11ShaderResourceView> m_srView = nullptr;
-	cxx::unique_i<ID3D11RenderTargetView> m_rtView = nullptr;
-	cxx::unique_i<ID3D11DepthStencilView> m_dsView = nullptr;
+	ID3D11Texture2D* m_texture;
+	ID3D11ShaderResourceView* m_srView = nullptr;
+	ID3D11RenderTargetView* m_rtView = nullptr;
+	ID3D11DepthStencilView* m_dsView = nullptr;
 	const unsigned int m_width;
 	const unsigned int m_height;
 	rhi::TextureFormat m_format;
@@ -89,18 +88,18 @@ public:
 	virtual rhi::SemanticIndex GetSemanticCount() const override;
 
 public:
-	VertexShader(ID3D11VertexShader& vertexShader, ID3D11InputLayout& inputLayout, std::vector<rhi::Semantic>&& layouts);
+	VertexShader(ID3D11VertexShader* vertexShader, ID3D11InputLayout* inputLayout, std::vector<rhi::Semantic>&& layouts);
 
 	~VertexShader();
 
-	ID3D11VertexShader* GetRaw() { return &m_vertexShader; }
+	ID3D11VertexShader* GetRaw() { return m_vertexShader; }
 
-	ID3D11InputLayout* GetInputLayout() { return &m_inputLayout; }
+	ID3D11InputLayout* GetInputLayout() { return m_inputLayout; }
 
 private:
 	unsigned int m_refCount = 1;
-	ID3D11VertexShader& m_vertexShader;
-	ID3D11InputLayout& m_inputLayout;
+	ID3D11VertexShader* m_vertexShader;
+	ID3D11InputLayout* m_inputLayout;
 	std::vector<rhi::Semantic> m_semantics;
 };
 
@@ -112,15 +111,15 @@ public:
 	virtual void AddReference() override;
 
 public:
-	PixelShader(ID3D11PixelShader& pixelShader);
+	PixelShader(ID3D11PixelShader* pixelShader);
 
 	~PixelShader();
 
-	ID3D11PixelShader* GetRaw() { return &m_pixelShader; }
+	ID3D11PixelShader* GetRaw() { return m_pixelShader; }
 
 private:
 	unsigned int m_refCount = 1;
-	ID3D11PixelShader& m_pixelShader;
+	ID3D11PixelShader* m_pixelShader;
 };
 
 class ShaderProgram : public rhi::ShaderProgram
@@ -128,12 +127,14 @@ class ShaderProgram : public rhi::ShaderProgram
 public:
 	virtual void Release() override { delete this; }
 
-	virtual rhi::VertexShader* GetVertexShader() const override { return m_vertexShader.get(); }
+	virtual rhi::VertexShader* GetVertexShader() const override { return m_vertexShader; }
 
-	virtual rhi::PixelShader* GetPixelShader() const override { return m_pixelShader.get(); }
+	virtual rhi::PixelShader* GetPixelShader() const override { return m_pixelShader; }
 
 public:
-	ShaderProgram(::VertexShader& vertexShader, ::PixelShader& pixelShader);
+	ShaderProgram(::VertexShader* vertexShader, ::PixelShader* pixelShader);
+
+	~ShaderProgram();
 
 	ID3D11VertexShader* GetVertexShader() { return m_vertexShader->GetRaw(); }
 
@@ -142,8 +143,8 @@ public:
 	ID3D11InputLayout* GetInputLayout() { return m_vertexShader->GetInputLayout(); }
 
 private:
-	cxx::unique_i<::VertexShader> m_vertexShader = nullptr;
-	cxx::unique_i<::PixelShader> m_pixelShader = nullptr;
+	::VertexShader* m_vertexShader = nullptr;
+	::PixelShader* m_pixelShader = nullptr;
 };
 
 class TextureSampler : public rhi::TextureSampler
@@ -213,13 +214,13 @@ public:
 
 	::Texture2D* GetColorBufferImplByIndex(rhi::RTIndex index) const;
 
-	::Texture2D* GetDepthStencilBufferImpl() const { return m_depthStencilBuffer.get(); }
+	::Texture2D* GetDepthStencilBufferImpl() const { return m_depthStencilBuffer; }
 
 private:
 	const unsigned int m_width;
 	const unsigned int m_height;
 	std::vector<::Texture2D*> m_colorBuffers;
-	cxx::unique_i<::Texture2D> m_depthStencilBuffer;
+	::Texture2D* m_depthStencilBuffer;
 };
 
 class SwapChain : public rhi::SwapChain
@@ -227,7 +228,7 @@ class SwapChain : public rhi::SwapChain
 public:
 	virtual void Release() override { delete this; }
 
-	virtual rhi::RenderTarget* GetBackBuffer() const override { return mRenderTarget; }
+	virtual rhi::RenderTarget* GetBackBuffer() const override { return m_renderTarget; }
 
 	virtual unsigned int GetWidth() const override { return m_windowWidth; }
 
@@ -255,7 +256,7 @@ private:
 
 	::Device& m_device;
 	IDXGISwapChain& m_swapChain;
-	::RenderTarget* mRenderTarget = nullptr;
+	::RenderTarget* m_renderTarget = nullptr;
 	unsigned int m_windowWidth = 0;
 	unsigned int m_windowHeight = 0;
 	const bool m_useDepthStencil;

@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include <timeapi.h>
 #include <time.h>
-#include <got2d/include/g2dengine.h>
-#include <got2d/include/g2drender.h>
-#include <got2d/include/g2dmessage.h>
+#include "g2dengine.h"
+#include "g2drender.h"
+#include "g2dmessage.h"
 #include "framework.h"
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -118,14 +118,14 @@ void Framework::QuitApp()
 
 
 
-void Framework::SetCursorPos(const gml::coord& pos)
+void Framework::SetCursorPos(const cxx::point2d<int>& pos)
 {
 	POINT p = { pos.x, pos.y };
 	::ClientToScreen(m_hWindow, &p);
 	::SetCursorPos(p.x, p.y);
 }
 
-gml::coord Framework::GetCursorPos()
+cxx::point2d<int> Framework::GetCursorPos()
 {
 	POINT p;
 	::GetCursorPos(&p);
@@ -206,11 +206,11 @@ bool Framework::IntializeEngine(const std::string& resPath)
 
 	std::string path = GetRunningDirectory() + resPath;
 
-	g2d::Engine::Config ecfg;
-	ecfg.nativeWindow = m_hWindow;
-	ecfg.resourceFolderPath = path.c_str();
+	g2d::Engine::CreationConfig ecfg;
+	ecfg.NativeWindow = m_hWindow;
+	ecfg.ResourceFolderPath = path.c_str();
 
-	return g2d::Engine::Initialize(ecfg);
+	return g2d::Engine::Initialize(ecfg) != g2d::Engine::InitialResult::Error;
 }
 
 int Framework::Start()
@@ -303,15 +303,15 @@ void Framework::DestroyApp()
 void Framework::OnWindowResize(uint32_t width, uint32_t height)
 {
 	//要在初始化之后再做这件事情
-	if (g2d::IsEngineInitialized())
+	if (g2d::Engine::IsInitialized())
 	{
-		g2d::GetEngine()->OnResize(width, height);
+		g2d::Engine::GetInstance()->OnResize(width, height);
 	}
 }
 
 void Framework::SolidMessageHandler(const g2d::Message& message)
 {
-	if (message.Event != g2d::MessageEvent::Invalid)
+	if (message.Event != g2d::MessageEvent::Unknown)
 		OnMessage(message);
 }
 

@@ -39,4 +39,8 @@ namespace g2d
 	{
 		return ::Engine::Instance;
 	}
+	bool Engine::IsInitialized()
+	{
+		return GetInstance() != nullptr;
+	}
 }

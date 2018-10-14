@@ -2,6 +2,7 @@
 #include "inner_RHI.h"
 #include "../../source/scope_utility.h"
 #include "dx11_enum.h"
+#include "cxx_scope.h"
 
 Device::Device(ID3D11Device& d3dDevice)
 	: m_d3dDevice(d3dDevice)
@@ -62,7 +63,7 @@ Device::~Device()
 			if (S_OK == m_d3dDevice.CreateRenderTargetView(texture, NULL, &rtView))
 			{
 				fb.dismiss();
-				return new ::Texture2D(*texture, *rtView, srView, format, width, height);
+				return new ::Texture2D(texture, rtView, srView, format, width, height);
 			}
 		}
 		else if ((binding & D3D11_BIND_DEPTH_STENCIL) > 0)
@@ -70,13 +71,13 @@ Device::~Device()
 			if (S_OK == m_d3dDevice.CreateDepthStencilView(texture, NULL, &dsView))
 			{
 				fb.dismiss();
-				return new ::Texture2D(*texture, *dsView, srView, format, width, height);
+				return new ::Texture2D(texture, dsView, srView, format, width, height);
 			}
 		}
 		else
 		{
 			fb.dismiss();
-			return new ::Texture2D(*texture, srView, format, width, height);
+			return new ::Texture2D(texture, srView, format, width, height);
 		}
 	}
 	return nullptr;
@@ -84,9 +85,16 @@ Device::~Device()
 
 rhi::SwapChain* Device::CreateSwapChain(void* nativeWindow, bool useDepthStencil, unsigned int windowWidth, unsigned int windowHeight)
 {
-	cxx::unique_i<IDXGIDevice> dxgiDevice = nullptr;
-	cxx::unique_i<IDXGIAdapter> adapter = nullptr;
-	cxx::unique_i<IDXGIFactory> factory = nullptr;
+	IDXGIDevice* dxgiDevice = nullptr;
+	IDXGIAdapter* adapter = nullptr;
+	IDXGIFactory* factory = nullptr;
+
+	auto fb = cxx::make_scope_guard([&]
+	{
+		cxx::safe_release(dxgiDevice);
+		cxx::safe_release(adapter);
+		cxx::safe_release(factory);
+	});
 
 	if (S_OK != m_d3dDevice.QueryInterface(
 		__uuidof(IDXGIDevice),
@@ -95,9 +103,7 @@ rhi::SwapChain* Device::CreateSwapChain(void* nativeWindow, bool useDepthStencil
 		return nullptr;
 	}
 
-	if (S_OK != dxgiDevice->GetParent(
-		__uuidof(IDXGIAdapter),
-		reinterpret_cast<void**>(&adapter)))
+	if (S_OK != dxgiDevice->GetAdapter(&adapter))
 	{
 		return nullptr;
 	}
@@ -130,6 +136,7 @@ rhi::SwapChain* Device::CreateSwapChain(void* nativeWindow, bool useDepthStencil
 	IDXGISwapChain* swapChain = nullptr;
 	if (S_OK == factory->CreateSwapChain(&m_d3dDevice, &scDesc, &swapChain))
 	{
+		fb.dismiss();
 		return new ::SwapChain(*this, *swapChain, useDepthStencil);
 	}
 	else
@@ -242,12 +249,12 @@ rhi::VertexShader* Device::CreateVertexShader(const char* source, const char* en
 	}
 
 	fb.dismiss();
-	return new ::VertexShader(*vertexShader, *inputLayout, std::move(m_semantics));
+	return new ::VertexShader(vertexShader, inputLayout, std::move(m_semantics));
 }
 
 rhi::PixelShader* Device::CreatePixelShader(const char* source, const char* entry)
 {
-	ID3DBlob* psBlob = CompileShaderSource(source, entry, "ps_5_0");
+	cxx::unique_i<ID3DBlob> psBlob(CompileShaderSource(source, entry, "ps_5_0"));
 
 	if (psBlob == nullptr)
 		return nullptr;
@@ -263,7 +270,7 @@ rhi::PixelShader* Device::CreatePixelShader(const char* source, const char* entr
 		return nullptr;
 	}
 
-	return new ::PixelShader(*pixelShader);
+	return new ::PixelShader(pixelShader);
 }
 
 rhi::ShaderProgram* Device::LinkShader(rhi::VertexShader* vertexShader, rhi::PixelShader* pixelShader)
@@ -273,7 +280,7 @@ rhi::ShaderProgram* Device::LinkShader(rhi::VertexShader* vertexShader, rhi::Pix
 	if (vertexShaderImpl == nullptr || pixelShaderImpl == nullptr)
 		return nullptr;
 
-	return new ::ShaderProgram(*vertexShaderImpl, *pixelShaderImpl);
+	return new ::ShaderProgram(vertexShaderImpl, pixelShaderImpl);
 }
 
 rhi::BlendState* Device::CreateBlendState(bool enabled, rhi::BlendFactor source, rhi::BlendFactor dest, rhi::BlendOperator op)

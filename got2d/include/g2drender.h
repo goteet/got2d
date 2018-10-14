@@ -16,8 +16,8 @@ namespace g2d
 	*/
 	struct GeometryVertex
 	{
-		cxx::float2 Position;
-		cxx::float2 Texcoord;
+		cxx::point2d<float> Position;
+		cxx::point2d<float> Texcoord;
 		cxx::color4f VertexColor;
 	};
 

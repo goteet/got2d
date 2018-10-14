@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
-#include <got2d/include/g2dengine.h>
-#include <got2d/include/g2dscene.h>
-#include <got2d/include/g2drender.h>
+#include "g2dengine.h"
+#include "g2dscene.h"
+#include "g2drender.h"
 
 
-g2d::Mesh* CreateHexagonMesh(float size, gml::color4 color, gml::aabb2d* aabb);
+g2d::Mesh* CreateHexagonMesh(float size, cxx::color4f color, cxx::aabb2d<float>* aabb);
 
 class Hexagon : public g2d::Component
 {
@@ -13,7 +13,7 @@ class Hexagon : public g2d::Component
 public://implement
 	virtual void Release() override { delete this; }
 
-	virtual const gml::aabb2d& GetLocalAABB() const override { return m_aabb; };
+	virtual const cxx::aabb2d<float>& GetLocalAABB() const override { return m_aabb; };
 
 	virtual void OnRender() override;
 
@@ -22,9 +22,9 @@ public:
 
 	~Hexagon();
 
-	const gml::color4& GetColor();
+	const cxx::color4f& GetColor();
 
-	void SetColor(const gml::color4& color);
+	void SetColor(const cxx::color4f& color);
 
 	virtual void OnLClick(const g2d::Mouse& mouse, const g2d::Keyboard& keyboard) override;
 
@@ -39,9 +39,9 @@ public:
 	virtual void OnKeyPress(g2d::KeyCode key, const g2d::Mouse& mouse, const g2d::Keyboard& keyboard) override;
 
 private:
-	gml::color4 m_lastColor;
-	gml::color4 m_color;
-	gml::aabb2d m_aabb;
+	cxx::color4f m_lastColor;
+	cxx::color4f m_color;
+	cxx::aabb2d<float> m_aabb;
 	g2d::Mesh* m_mesh;
 	g2d::Material* m_material;
 };
@@ -52,7 +52,7 @@ class HexagonBoard : public g2d::Component
 public:
 	virtual void Release() override { delete this; }
 
-	virtual const gml::aabb2d& GetLocalAABB() const override { return m_aabb; };
+	virtual const cxx::aabb2d<float>& GetLocalAABB() const override { return m_aabb; };
 
 	virtual void OnInitial() override;
 
@@ -67,15 +67,15 @@ public:
 
 	~HexagonBoard();
 
-	void SetHexagonColor(gml::color4 color, int q, int r);
+	void SetHexagonColor(cxx::color4f color, int q, int r);
 
 private:
-	void PositionToHex(gml::vec2, int& outQ, int& outR);
+	void PositionToHex(cxx::float2, int& outQ, int& outR);
 
 	int HexToIndex(int q, int r);
 
 	int m_lastIndex = -1;
-	gml::aabb2d m_aabb;
+	cxx::aabb2d<float> m_aabb;
 	g2d::Mesh* m_mesh;
 	g2d::Material* m_material;
 };
@@ -89,13 +89,13 @@ public: //implement
 
 	virtual void OnLDragBegin(const g2d::Mouse& mouse, const g2d::Keyboard& keyboard) override
 	{
-		auto worldP = GetSceneNode()->GetScene()->GetMainCamera()->ScreenToWorld(mouse.GetCursorPosition());
+		auto worldP = GetSceneNode()->GetScene()->GetDefaultCamera()->ScreenToWorld(mouse.GetCursorPosition());
 		m_dragOffset = GetSceneNode()->WorldToLocal(worldP);
 	}
 
 	virtual void OnLDragging(const g2d::Mouse& mouse, const g2d::Keyboard& keyboard) override
 	{
-		auto worldP = GetSceneNode()->GetScene()->GetMainCamera()->ScreenToWorld(mouse.GetCursorPosition());
+		auto worldP = GetSceneNode()->GetScene()->GetDefaultCamera()->ScreenToWorld(mouse.GetCursorPosition());
 		GetSceneNode()->SetWorldPosition(worldP - m_dragOffset);
 	}
 
@@ -107,5 +107,5 @@ public: //implement
 		}
 	}
 
-	gml::vec2 m_dragOffset;
+	cxx::float2 m_dragOffset;
 };

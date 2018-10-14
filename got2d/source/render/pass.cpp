@@ -138,7 +138,7 @@ Pass::~Pass()
 {
 	for (auto& t : mTextures)
 	{
-		t->Release();
+		cxx::safe_release(t);
 	}
 	mTextures.clear();
 }

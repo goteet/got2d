@@ -115,11 +115,11 @@ public:
 
 	::Scene* GetSceneImpl();
 
-	::SceneNode* GetParentNodeImpl();
+	virtual ::SceneNode* GetParentNodeImpl();
 
-	::SceneNode* GetPrevSiblingImpl();
+	virtual ::SceneNode* GetPrevSiblingImpl();
 
-	::SceneNode* GetNextSiblingImpl();
+	virtual ::SceneNode* GetNextSiblingImpl();
 
 	virtual void AdjustRenderingOrder();
 
@@ -197,11 +197,11 @@ private:
 
 class RootSceneNode : public SceneNode
 {
-	virtual g2d::SceneNode* GetParentNode() override { return nullptr; }
+	virtual ::SceneNode* GetParentNodeImpl() override { return nullptr; }
 
-	virtual g2d::SceneNode* GetPrevSiblingNode() override { return nullptr; }
+	virtual ::SceneNode* GetPrevSiblingImpl() override { return nullptr; }
 
-	virtual g2d::SceneNode* GetNextSiblingNode() override { return nullptr; }
+	virtual ::SceneNode* GetNextSiblingImpl() override { return nullptr; }
 
 	virtual void MoveToFront() override { }
 

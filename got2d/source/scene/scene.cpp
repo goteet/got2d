@@ -12,7 +12,7 @@ bool RenderingOrderSorter(g2d::Component* a, g2d::Component* b);
 //*************************************************************
 g2d::SceneNode* Scene::GetRootNode()
 {
-	return mRootNode.get();
+	return mRootNode;
 }
 
 g2d::Camera* Scene::CreateAdditionalCameraNode()
@@ -94,6 +94,7 @@ Scene::Scene(float boundSize)
 
 Scene::~Scene()
 {
+	cxx::safe_delete(mRootNode);
 	UnRegisterKeyEventReceiver();
 	UnRegisterMouseEventReceiver();
 }
